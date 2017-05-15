@@ -1,0 +1,8 @@
+﻿Celem projektu jest stworzenie gry platformowo-logicznej bazującej na grze Portal2.
+Będzie to gra kooperacyjna dla dwóch graczy wykorzystująca lokalną sieć.
+Gracze (każdy sterujący jedną postacią) będą mieli za zadanie rozwiązać szereg zagadek logicznych. Ułatwią im to portale, które będą tworzyć przejścia pomiędzy różnymi miejscami na mapie. To gracze decydują jak szybko dojdą do końca poziomu i w jaki sposób. 
+
+Podział zadań:
+- Anita Dworzańska - algorytmy i ogólna logika rozgrywki,
+- Marcin Gałecki - warstwa sieciowa,
+- Piotr Filipkowski - implementacja animacji i projekt poziomów.
