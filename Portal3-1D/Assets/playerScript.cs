@@ -10,8 +10,7 @@ public class playerScript : MonoBehaviour {
     private Rigidbody2D rg2d;
 
     bool grounded = false;
-    bool rightHit = false;
-    bool leftHit = false;
+
     public Transform groundCheck;
     float groundRadius = 0.2f;
     public LayerMask whatIsGround;
