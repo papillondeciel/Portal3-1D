@@ -5,11 +5,12 @@ using UnityEngine;
 public class playerScript : MonoBehaviour {
 
     private float maxSpeed = 12f;
-
+    public GameObject playerClone;
     private Transform trans;
     private Rigidbody2D rg2d;
-
+    [HideInInspector] public SpriteRenderer rend;
     bool grounded = false;
+    public bool mimic = false;
 
     public Transform groundCheck;
     float groundRadius = 0.2f;
@@ -19,6 +20,8 @@ public class playerScript : MonoBehaviour {
     void Start () {
         trans = GetComponent<Transform>(); //pobieranie cech komponentu Transform
         rg2d = GetComponent<Rigidbody2D>();
+        rend = GetComponent<SpriteRenderer>();
+        rg2d.freezeRotation = true;
     }
 	
 	// Update is called once per frame
@@ -57,7 +60,6 @@ public class playerScript : MonoBehaviour {
     private void FixedUpdate() //używajmy fizyki do ruchu, jest bardziej naturalnie, w tej funkcji zamieszcza się większość rzeczy związanych z fizyką
     {
         grounded = Physics2D.OverlapCircle(groundCheck.position, groundRadius, whatIsGround);
-
         float move = Input.GetAxis("Horizontal");
         rg2d.velocity = new Vector2(move * maxSpeed, rg2d.velocity.y);
     }
