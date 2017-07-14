@@ -5,11 +5,14 @@ using UnityEngine;
 public class playerScript : MonoBehaviour {
 
     private float maxSpeed = 12f;
+    private float maxJump = 12f;
+    private float minJump = 3f;
     public GameObject playerClone;
     private Transform trans;
     private Rigidbody2D rg2d;
     [HideInInspector] public SpriteRenderer rend;
     bool grounded = false;
+    bool jump = false;
     public bool mimic = false;
 
     public Transform groundCheck;
@@ -52,7 +55,7 @@ public class playerScript : MonoBehaviour {
         //}
         if (grounded && Input.GetKeyDown(KeyCode.Space)) //skok przy użyciu fizyki
         {
-            rg2d.AddForce(new Vector2(0, 550.0f));
+            rg2d.AddForce(new Vector2(0, maxJump), ForceMode2D.Impulse);
         }
 
     }
