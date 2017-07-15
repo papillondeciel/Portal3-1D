@@ -5,7 +5,6 @@ using UnityEngine;
 public class portalApearing : MonoBehaviour {
 
     private Transform trans;
-    //private Rigidbody2D rb2d;
     public GameObject portal;
     public LayerMask isItWall;
 
@@ -18,8 +17,7 @@ public class portalApearing : MonoBehaviour {
    	// Use this for initialization
 	void Start () {
         trans = GetComponent<Transform>();
-        //rb2d = GetComponent<Rigidbody2D>();
-        if (trans.gameObject.name == "blueProjectile")
+        if (trans.gameObject.name == "blueProjectile") //w zaleznosci od koloru pocisku, jest zdeterminowana nazwa portalu
             {
                 color = Color.BLUE;
                 portalName = "bluePortal";
@@ -39,10 +37,9 @@ public class portalApearing : MonoBehaviour {
 
     void OnTriggerEnter2D(Collider2D col)
     {
-        if (IsInLayerMask(col.gameObject.layer, isItWall.value))
+        if (IsInLayerMask(col.gameObject.layer, isItWall.value)) //
         {
-            //Destroy(GameObject.Find(portalName));
-            if (color == Color.BLUE)
+            if (color == Color.BLUE)//usuniecie starego portalu (w zaleznosci, jakiego koloru tworzony jest nowy)
             {
                 if (player.blueOldPortal != null)
                     Destroy(player.blueOldPortal);
@@ -52,18 +49,20 @@ public class portalApearing : MonoBehaviour {
                 if (player.orangeOldPortal != null)
                     Destroy(player.orangeOldPortal);
             }
-            
-            GameObject newPortal = (GameObject)Instantiate(portal, trans.position, Quaternion.identity);
-            if (color == Color.BLUE)
+
+            //tworzenie kopii portalu, z uwzglednieniem pozycji w ktorej sie styknal ze scianal i rotacja w jakiej jest sciana (przyjmuje taką samą rotacje)
+            GameObject newPortal = (GameObject)Instantiate(portal, trans.position, col.gameObject.GetComponent<Transform>().rotation);
+            newPortal.name = portalName; // przypisanie nazwy skopiowanemu portalowi
+            if (color == Color.BLUE) //przypisanie nowego portalu do posiadanej przez gracza referencji portalu
                 player.blueOldPortal = newPortal;
             else if (color == Color.ORANGE)
                 player.orangeOldPortal = newPortal;
-            newPortal.name = portalName;
-            DestroyObject(trans.gameObject);
+            
+            DestroyObject(trans.gameObject); // usuwanie pocisku
         }        
     }
 
-    public static bool IsInLayerMask(int layer, LayerMask layermask)
+    public static bool IsInLayerMask(int layer, LayerMask layermask) //sprawdzenie czy dany 'layer' znajduje się w tych podanych do skryptu ('layermask')
     {
         return layermask == (layermask | (1 << layer));
     }
