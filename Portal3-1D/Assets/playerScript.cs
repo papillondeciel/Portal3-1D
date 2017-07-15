@@ -18,7 +18,7 @@ public class playerScript : MonoBehaviour {
     // Use this for initialization
     void Start () {
         trans = GetComponent<Transform>(); //pobieranie cech komponentu Transform
-        rg2d = GetComponent<Rigidbody2D>();
+        rg2d = GetComponent<Rigidbody2D>(); //pobieranie cech komponentu Rigidbody2D
     }
 	
 	// Update is called once per frame
