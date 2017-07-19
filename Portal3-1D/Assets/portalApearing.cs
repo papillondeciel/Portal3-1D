@@ -58,6 +58,7 @@ public class portalApearing : MonoBehaviour {
             //tworzenie kopii portalu, z uwzglednieniem pozycji w ktorej sie styknal ze scianal i rotacja w jakiej jest sciana (przyjmuje taką samą rotacje)
             GameObject newPortal = (GameObject)Instantiate(portal, trans.position, rotation);
             
+            Vector3 position = col.gameObject.GetComponent<Transform>().position; //pobieranie pozycji obiektu z ktorym zaszla kolizjia (sciana)
             //wykrywanie w jakim kierunku leciała kula względem ściany z którą się zderzyła
             if (rotation.z == 0)
             {
