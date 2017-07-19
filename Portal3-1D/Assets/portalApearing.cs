@@ -13,10 +13,12 @@ public class portalApearing : MonoBehaviour {
     private Color color;
     
     private string portalName;
+    private Vector2 startPosition;
 
    	// Use this for initialization
 	void Start () {
         trans = GetComponent<Transform>();
+        Vector2 startPosition = new Vector2(trans.position.x, trans.position.y); // zapisanie początkowego położenia kuli
         if (trans.gameObject.name == "blueProjectile") //w zaleznosci od koloru pocisku, jest zdeterminowana nazwa portalu
             {
                 color = Color.BLUE;
@@ -37,7 +39,9 @@ public class portalApearing : MonoBehaviour {
 
     void OnTriggerEnter2D(Collider2D col)
     {
-        if (IsInLayerMask(col.gameObject.layer, isItWall.value)) //
+        Vector2 velocity = GetComponent<Rigidbody2D>().velocity;
+
+        if (IsInLayerMask(col.gameObject.layer, isItWall.value))
         {
             if (color == Color.BLUE)//usuniecie starego portalu (w zaleznosci, jakiego koloru tworzony jest nowy)
             {
@@ -50,8 +54,34 @@ public class portalApearing : MonoBehaviour {
                     Destroy(player.orangeOldPortal);
             }
 
+            Quaternion rotation = col.gameObject.GetComponent<Transform>().rotation; //pobieranie rotacji obiektu z ktorym zaszla kolizjia (sciana)
             //tworzenie kopii portalu, z uwzglednieniem pozycji w ktorej sie styknal ze scianal i rotacja w jakiej jest sciana (przyjmuje taką samą rotacje)
-            GameObject newPortal = (GameObject)Instantiate(portal, trans.position, col.gameObject.GetComponent<Transform>().rotation);
+            GameObject newPortal = (GameObject)Instantiate(portal, trans.position, rotation);
+            
+            //wykrywanie w jakim kierunku leciała kula względem ściany z którą się zderzyła
+            if (rotation.z == 0)
+            {
+                if (startPosition.x > position.x)
+                {
+                    Debug.Log("Kula leci w lewo!");
+                }
+                else if(startPosition.x < position.x)
+                {
+                    Debug.Log("Kuls leci w prawo!");
+                }
+            }
+            else
+            {
+                if (startPosition.y > position.y)
+                {
+                    Debug.Log("Kula leci w dół!");
+                }
+                else if(startPosition.y < position.y)
+                {
+                    Debug.Log("Kula leci w górę!");
+                }
+            }
+
             newPortal.name = portalName; // przypisanie nazwy skopiowanemu portalowi
             if (color == Color.BLUE) //przypisanie nowego portalu do posiadanej przez gracza referencji portalu
                 player.blueOldPortal = newPortal;
