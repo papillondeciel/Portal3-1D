@@ -6,65 +6,75 @@ public class playerScript : MonoBehaviour {
 
     private float maxSpeed = 12f;
     private float maxJump = 12f;
-    private float minJump = 3f;
-    public GameObject playerClone;
+    private float minJump = 5.5f;
+    private float moveForce = 120f;
+    public float maxFallingSpeed;
+    public bool jumpEnabled = true;
     private Transform trans;
     private Rigidbody2D rg2d;
     [HideInInspector] public SpriteRenderer rend;
-    bool grounded = false;
-    bool jump = false;
+    [HideInInspector] public bool grounded = false;
     public bool mimic = false;
-
+    public bool thrown = false;
+    public bool invertHorizontalMovement = false;
+    private bool pendInvertHorizontal = false;
     public Transform groundCheck;
     float groundRadius = 0.2f;
     public LayerMask whatIsGround;
 
     // Use this for initialization
     void Start () {
-        trans = GetComponent<Transform>(); //pobieranie cech komponentu Transform
+        trans = GetComponent<Transform>();
         rg2d = GetComponent<Rigidbody2D>();
         rend = GetComponent<SpriteRenderer>();
         rg2d.freezeRotation = true;
     }
 	
-	// Update is called once per frame
 	void Update () {
-        // Transformacje położenie w zależności od naciśniętego klawisza
-        //if (Input.GetKey(KeyCode.LeftArrow))
-        //{
-        //    trans.Translate(-0.25f, 0, 0);
-        //}
-        //else if (Input.GetKey(KeyCode.RightArrow))
-        //{
-        //    trans.Translate(0.25f, 0, 0);
-        //}
-        //else if (Input.GetKey(KeyCode.UpArrow))
-        //{
-        //    trans.Translate(0, 0.25f, 0);
-        //}
-
-        //rotacja postaci, jezeli jest przekrzywiona
-        ////Do poprawy poniewaz obecnie postac drga -.- przy malych bardzo kątach, mniejszych niz kat obrotu (grrr)
-        //if (trans.rotation.z > 0)
-        //{
-        //    trans.Rotate(0, 0, -2);
-        //}
-        //else if(trans.rotation.z < 0)
-        //{
-        //    trans.Rotate(0, 0, 2);
-        //}
-        if (grounded && Input.GetKeyDown(KeyCode.Space)) //skok przy użyciu fizyki
+        
+        if (grounded && Input.GetKeyDown(KeyCode.Space) && jumpEnabled)
+            Jump();
+        if(pendInvertHorizontal)
         {
-            rg2d.AddForce(new Vector2(0, maxJump), ForceMode2D.Impulse);
+            if(Input.GetAxis("Horizontal") == 0)
+            {
+                invertHorizontalMovement = false;
+                pendInvertHorizontal = false;
+            }
         }
 
     }
-
-    private void FixedUpdate() //używajmy fizyki do ruchu, jest bardziej naturalnie, w tej funkcji zamieszcza się większość rzeczy związanych z fizyką
+    private void Jump()
+    {
+        
+        Vector2 resolvedJump = new Vector2(rg2d.velocity.x, maxJump);
+        rg2d.AddForce(resolvedJump, ForceMode2D.Impulse);
+    }
+    private void FixedUpdate()
     {
         grounded = Physics2D.OverlapCircle(groundCheck.position, groundRadius, whatIsGround);
         float move = Input.GetAxis("Horizontal");
-        rg2d.velocity = new Vector2(move * maxSpeed, rg2d.velocity.y);
+        if (invertHorizontalMovement)
+            move = -move;
+        if (rg2d.velocity.y < maxFallingSpeed)
+            rg2d.velocity = new Vector2(rg2d.velocity.x, maxFallingSpeed);
+        if (grounded)
+        {
+            rg2d.velocity = new Vector2(move * maxSpeed, rg2d.velocity.y);
+            thrown = false;
+        }
+        else if (!thrown)
+        {
+            if (move * rg2d.velocity.x < maxSpeed)
+                rg2d.AddForce(Vector2.right * move * moveForce);
+
+            if (Mathf.Abs(rg2d.velocity.x) > maxSpeed)
+                rg2d.velocity = new Vector2(Mathf.Sign(rg2d.velocity.x) * maxSpeed, rg2d.velocity.y);
+        }
+    }
+    public void pendHorizontalMovementChange()
+    {
+        pendInvertHorizontal = true;
     }
 
 
