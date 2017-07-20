@@ -23,7 +23,7 @@ public class portalShooting : MonoBehaviour {
     // Use this for initialization
     void Start () {
         playerTrans = GetComponent<Transform>();
-        projectileVelovity = 2100f;
+        projectileVelovity = 3000f;
     }
 	
 	// Update is called once per frame

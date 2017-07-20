@@ -50,6 +50,7 @@ public class portalApearing : MonoBehaviour {
                     if (player.blueOldPortal != null)
                     {
                         Destroy(player.blueOldPortal);
+                        if(player.orangeOldPortal != null)
                         player.orangeOldPortal.GetComponent<portalScript>().secondPortalFound = false;
                     }
                 }
@@ -58,7 +59,8 @@ public class portalApearing : MonoBehaviour {
                     if (player.orangeOldPortal != null)
                     {
                         Destroy(player.orangeOldPortal);
-                        player.blueOldPortal.GetComponent<portalScript>().secondPortalFound = false;
+                        if (player.blueOldPortal != null)
+                            player.blueOldPortal.GetComponent<portalScript>().secondPortalFound = false;
                     }
                 }
 
