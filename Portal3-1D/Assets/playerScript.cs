@@ -24,10 +24,15 @@ public class playerScript : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+<<<<<<< HEAD
         trans = GetComponent<Transform>();
         rg2d = GetComponent<Rigidbody2D>();
         rend = GetComponent<SpriteRenderer>();
         rg2d.freezeRotation = true;
+=======
+        trans = GetComponent<Transform>(); //pobieranie cech komponentu Transform
+        rg2d = GetComponent<Rigidbody2D>(); //pobieranie cech komponentu Rigidbody2D
+>>>>>>> origin/master
     }
 	
 	void Update () {
