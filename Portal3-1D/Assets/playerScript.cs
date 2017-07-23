@@ -6,11 +6,9 @@ public class playerScript : MonoBehaviour {
 
     private float maxSpeed = 12f;
     private float maxJump = 12f;
-    private float minJump = 5.5f;
     private float moveForce = 120f;
     public float maxFallingSpeed;
     public bool jumpEnabled = true;
-    private Transform trans;
     private Rigidbody2D rg2d;
     [HideInInspector] public SpriteRenderer rend;
     [HideInInspector] public bool grounded = false;
@@ -24,7 +22,6 @@ public class playerScript : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        trans = GetComponent<Transform>();
         rg2d = GetComponent<Rigidbody2D>();
         rend = GetComponent<SpriteRenderer>();
         rg2d.freezeRotation = true;
@@ -46,7 +43,6 @@ public class playerScript : MonoBehaviour {
     }
     private void Jump()
     {
-        
         Vector2 resolvedJump = new Vector2(rg2d.velocity.x, maxJump);
         rg2d.AddForce(resolvedJump, ForceMode2D.Impulse);
     }

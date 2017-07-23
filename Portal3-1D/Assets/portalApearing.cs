@@ -18,7 +18,7 @@ public class portalApearing : MonoBehaviour {
    	// Use this for initialization
 	void Start () {
         trans = GetComponent<Transform>();
-        Vector2 startPosition = new Vector2(trans.position.x, trans.position.y); // zapisanie początkowego położenia kuli
+        startPosition = new Vector2(trans.position.x, trans.position.y); // zapisanie początkowego położenia kuli
         if (trans.gameObject.name == "blueProjectile") //w zaleznosci od koloru pocisku, jest zdeterminowana nazwa portalu
             {
                 color = Color.BLUE;
@@ -77,7 +77,7 @@ public class portalApearing : MonoBehaviour {
                 {
                     if (startPosition.x > position.x)
                     {
-                        Debug.Log("Kula leci w lewo!");
+                        //Kula leci w lewo!
                         newPortalScript.facingDirection = portalScript.FacingDirection.Right;
                         newPortal.transform.localEulerAngles = new Vector3(0f, 0f, 0f);
                         newPortal.transform.position = new Vector2(col.transform.position.x + 0.11f, newPortal.transform.position.y);
@@ -94,14 +94,14 @@ public class portalApearing : MonoBehaviour {
                 {
                     if (startPosition.y > position.y)
                     {
-                        Debug.Log("Kula leci w dół!");
+                        //Kula leci w dół!
                         newPortalScript.facingDirection = portalScript.FacingDirection.Up;
                         newPortal.transform.localEulerAngles = new Vector3(0f, 0f, 90f);
                         newPortal.transform.position = new Vector2(newPortal.transform.position.x, col.transform.position.y + 0.11f);
                     }
                     else if (startPosition.y < position.y)
                     {
-                        Debug.Log("Kula leci w górę!");
+                        //Kula leci w górę!
                         newPortalScript.facingDirection = portalScript.FacingDirection.Down;
                         newPortal.transform.localEulerAngles = new Vector3(0f, 0f, -90f);
                         newPortal.transform.position = new Vector2(newPortal.transform.position.x, col.transform.position.y - 0.11f);

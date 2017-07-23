@@ -18,12 +18,25 @@ public class portalScript : MonoBehaviour {
     // Use this for initialization
     void Start () {
         particles = this.transform.GetChild(2).GetComponent<ParticleSystem>();
+        searchForOtherPortal();
+    }
+	
+	// Update is called once per frame
+	void Update () {
+		if(!secondPortalFound)
+        {
+            searchForOtherPortal();
+        }
+    }
+    private void searchForOtherPortal()
+    {
         if (this.name == "bluePortal")
         {
             if (GameObject.Find("orangePortal"))
             {
                 secondPortal = GameObject.Find("orangePortal");
                 secondPortalFound = true;
+                particles.Play();
             }
             else
             {
@@ -38,6 +51,7 @@ public class portalScript : MonoBehaviour {
             {
                 secondPortal = GameObject.Find("bluePortal");
                 secondPortalFound = true;
+                particles.Play();
             }
             else
             {
@@ -53,49 +67,6 @@ public class portalScript : MonoBehaviour {
             active = true;
         }
     }
-	
-	// Update is called once per frame
-	void Update () {
-		if(!secondPortalFound)
-        {
-            if (this.name == "bluePortal")
-            {
-                if (GameObject.Find("orangePortal"))
-                {
-                    secondPortal = GameObject.Find("orangePortal");
-                    secondPortalFound = true;
-                    active = true;
-                    particles.Play();
-                }
-                else
-                {
-                    secondPortalFound = false;
-                    active = false;
-                }
-            }
-            else
-            {
-                if (GameObject.Find("bluePortal"))
-                {
-                    secondPortal = GameObject.Find("bluePortal");
-                    secondPortalFound = true;
-                    active = true;
-                    particles.Play();
-                }
-                else
-                {
-                    secondPortalFound = false;
-                    active = false;
-                }
-            }
-            if (secondPortalFound)
-            {
-                oppositeWall = secondPortal.GetComponent<portalScript>().wallOn;
-                secondPortalFacing = secondPortal.GetComponent<portalScript>().facingDirection;
-                active = true;
-            }
-        }
-    }
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (active)
@@ -103,14 +74,13 @@ public class portalScript : MonoBehaviour {
             if (collision.gameObject.tag == "Player")
             {
                 playerScript player = collision.gameObject.GetComponent<playerScript>();
-
                 if (!player.mimic)
                 {
                     Physics2D.IgnoreCollision(collision.gameObject.GetComponent<Collider2D>(), wallOn);
                     if (secondPortalFacing == FacingDirection.Left)
                     {
                         if (this.facingDirection == FacingDirection.Up)
-                            teleportedCopy = Instantiate(collision.gameObject, new Vector3(secondPortal.transform.position.x + 0.5f, secondPortal.transform.position.y + player.transform.position.y - transform.position.y - 0.7f), Quaternion.identity);
+                            teleportedCopy = Instantiate(collision.gameObject, new Vector3(secondPortal.transform.position.x + 0.5f, secondPortal.transform.position.y + player.transform.position.y - transform.position.y - 1f), Quaternion.identity);
                         else
                             teleportedCopy = Instantiate(collision.gameObject, new Vector3(secondPortal.transform.position.x + 0.5f, secondPortal.transform.position.y + player.transform.position.y - transform.position.y), Quaternion.identity);
                         teleportedScript = teleportedCopy.GetComponent<playerScript>();
@@ -118,8 +88,8 @@ public class portalScript : MonoBehaviour {
                         teleportedScript.rend.material.SetFloat("_CutPos", secondPortal.transform.position.x);
                         if (this.facingDirection == FacingDirection.Left)
                         {
-                            teleportedScript.GetComponent<Rigidbody2D>().velocity = new Vector2(-player.GetComponent<Rigidbody2D>().velocity.x, player.GetComponent<Rigidbody2D>().velocity.y);
                             teleportedScript.invertHorizontalMovement = true;
+                            teleportedScript.GetComponent<Rigidbody2D>().simulated = false;
                         }
                         else if (this.facingDirection == FacingDirection.Up)
                             teleportedScript.thrown = true;
@@ -129,7 +99,7 @@ public class portalScript : MonoBehaviour {
                     else if (secondPortalFacing == FacingDirection.Right)
                     {
                         if (this.facingDirection == FacingDirection.Up)
-                            teleportedCopy = Instantiate(collision.gameObject, new Vector3(secondPortal.transform.position.x - 0.5f, secondPortal.transform.position.y + player.transform.position.y - transform.position.y - 0.7f), Quaternion.identity);
+                            teleportedCopy = Instantiate(collision.gameObject, new Vector3(secondPortal.transform.position.x - 0.5f, secondPortal.transform.position.y + player.transform.position.y - transform.position.y - 1f), Quaternion.identity);
                         else
                             teleportedCopy = Instantiate(collision.gameObject, new Vector3(secondPortal.transform.position.x - 0.5f, secondPortal.transform.position.y + player.transform.position.y - transform.position.y), Quaternion.identity);
 
@@ -137,7 +107,10 @@ public class portalScript : MonoBehaviour {
                         teleportedScript.rend.material.SetInt("_CutDirection", (int)FacingDirection.Right);
                         teleportedScript.rend.material.SetFloat("_CutPos", secondPortal.transform.position.x);
                         if (this.facingDirection == FacingDirection.Right)
+                        {
                             teleportedScript.invertHorizontalMovement = true;
+                            teleportedScript.GetComponent<Rigidbody2D>().simulated = false;
+                        }
                         else if (this.facingDirection == FacingDirection.Up)
                             teleportedScript.thrown = true;
                         else
@@ -201,6 +174,8 @@ public class portalScript : MonoBehaviour {
                         player.rend.material.SetInt("_CutDirection", (int)FacingDirection.Down);
                         player.rend.material.SetFloat("_CutPos", this.transform.position.y);
                     }
+                    collision.GetComponent<portalShooting>().enabled = false;
+                    teleportedCopy.GetComponent<portalShooting>().enabled = false;
                 }
             }
         }
@@ -226,6 +201,10 @@ public class portalScript : MonoBehaviour {
                     {
                         teleportedCopy.transform.position = new Vector2(secondPortal.transform.position.x + player.transform.position.y - transform.position.y, secondPortal.transform.position.y - player.transform.position.x + transform.position.x);
                     }
+                    else if (this.facingDirection == FacingDirection.Right && secondPortalFacing == FacingDirection.Right)
+                    {
+                        teleportedCopy.transform.position = new Vector2(secondPortal.transform.position.x - player.transform.position.x + transform.position.x, secondPortal.transform.position.y + player.transform.position.y - transform.position.y);
+                    }
                     else if (this.facingDirection == FacingDirection.Right && secondPortalFacing == FacingDirection.Down)
                     {
                         teleportedCopy.transform.position = new Vector2(secondPortal.transform.position.x + player.transform.position.y - transform.position.y, secondPortal.transform.position.y + player.transform.position.x - transform.position.x);
@@ -233,6 +212,10 @@ public class portalScript : MonoBehaviour {
                     else if (this.facingDirection == FacingDirection.Left && secondPortalFacing == FacingDirection.Up)
                     {
                         teleportedCopy.transform.position = new Vector2(secondPortal.transform.position.x + player.transform.position.y - transform.position.y, secondPortal.transform.position.y + player.transform.position.x - transform.position.x);
+                    }
+                    else if (this.facingDirection == FacingDirection.Left && secondPortalFacing == FacingDirection.Left)
+                    {
+                        teleportedCopy.transform.position = new Vector2(secondPortal.transform.position.x - player.transform.position.x + transform.position.x, secondPortal.transform.position.y + player.transform.position.y - transform.position.y);
                     }
                     else if (this.facingDirection == FacingDirection.Left && secondPortalFacing == FacingDirection.Down)
                     {
@@ -275,6 +258,8 @@ public class portalScript : MonoBehaviour {
                                     teleportedScript.GetComponent<Rigidbody2D>().velocity = new Vector2(player.GetComponent<Rigidbody2D>().velocity.y, -player.GetComponent<Rigidbody2D>().velocity.x);
                                 else if (secondPortalFacing == FacingDirection.Down)
                                     teleportedScript.GetComponent<Rigidbody2D>().velocity = new Vector2(player.GetComponent<Rigidbody2D>().velocity.y, player.GetComponent<Rigidbody2D>().velocity.x);
+                                else if (secondPortalFacing == FacingDirection.Right)
+                                    teleportedScript.GetComponent<Rigidbody2D>().velocity = new Vector2(-player.GetComponent<Rigidbody2D>().velocity.x, player.GetComponent<Rigidbody2D>().velocity.y);
                             }
                             Physics2D.IgnoreCollision(teleportedScript.GetComponent<Collider2D>(), wallOn, false);
                             Physics2D.IgnoreCollision(teleportedScript.GetComponent<Collider2D>(), oppositeWall, false);
@@ -294,6 +279,8 @@ public class portalScript : MonoBehaviour {
                                     teleportedScript.GetComponent<Rigidbody2D>().velocity = new Vector2(player.GetComponent<Rigidbody2D>().velocity.y, player.GetComponent<Rigidbody2D>().velocity.x);
                                 else if (secondPortalFacing == FacingDirection.Down)
                                     teleportedScript.GetComponent<Rigidbody2D>().velocity = new Vector2(player.GetComponent<Rigidbody2D>().velocity.y, -player.GetComponent<Rigidbody2D>().velocity.x);
+                                else if (secondPortalFacing == FacingDirection.Left)
+                                    teleportedScript.GetComponent<Rigidbody2D>().velocity = new Vector2(-player.GetComponent<Rigidbody2D>().velocity.x, player.GetComponent<Rigidbody2D>().velocity.y);
                             }
 
                         }
@@ -352,6 +339,7 @@ public class portalScript : MonoBehaviour {
                     Destroy(teleportedCopy);
                     player.rend.material.SetInt("_CutDirection", 0);
                 }
+                collision.GetComponent<portalShooting>().enabled = true;
             }
         }
     }
