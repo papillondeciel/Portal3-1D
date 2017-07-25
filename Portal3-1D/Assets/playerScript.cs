@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class playerScript : MonoBehaviour {
+public class playerScript : NetworkBehaviour {
 
     private float maxSpeed = 12f;
     private float maxJump = 12f;
@@ -19,6 +20,7 @@ public class playerScript : MonoBehaviour {
     public Transform groundCheck;
     float groundRadius = 0.2f;
     public LayerMask whatIsGround;
+    public NetworkConnection networkConnection;
 
     // Use this for initialization
     void Start () {
@@ -29,8 +31,12 @@ public class playerScript : MonoBehaviour {
 	
 	void Update () {
         
+        if (!isLocalPlayer) 
+            return;
+
         if (grounded && Input.GetKeyDown(KeyCode.Space) && jumpEnabled)
             Jump();
+
         if(pendInvertHorizontal)
         {
             if(Input.GetAxis("Horizontal") == 0)
@@ -39,15 +45,18 @@ public class playerScript : MonoBehaviour {
                 pendInvertHorizontal = false;
             }
         }
-
     }
     private void Jump()
     {
         Vector2 resolvedJump = new Vector2(rg2d.velocity.x, maxJump);
         rg2d.AddForce(resolvedJump, ForceMode2D.Impulse);
     }
+
     private void FixedUpdate()
     {
+        if (!isLocalPlayer) 
+            return;
+
         grounded = Physics2D.OverlapCircle(groundCheck.position, groundRadius, whatIsGround);
         float move = Input.GetAxis("Horizontal");
         if (invertHorizontalMovement)
@@ -68,6 +77,7 @@ public class playerScript : MonoBehaviour {
                 rg2d.velocity = new Vector2(Mathf.Sign(rg2d.velocity.x) * maxSpeed, rg2d.velocity.y);
         }
     }
+
     public void pendHorizontalMovementChange()
     {
         pendInvertHorizontal = true;

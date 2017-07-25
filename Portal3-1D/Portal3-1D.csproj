@@ -79,6 +79,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\fps.cs" />
+    <Compile Include="Assets\networkManager.cs" />
     <Compile Include="Assets\playerScript.cs" />
     <Compile Include="Assets\portalApearing.cs" />
     <Compile Include="Assets\portalScript.cs" />

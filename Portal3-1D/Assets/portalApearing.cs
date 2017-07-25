@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class portalApearing : MonoBehaviour {
+public class portalApearing : NetworkBehaviour {
 
     private Transform trans;
     public GameObject portal;
@@ -20,22 +21,18 @@ public class portalApearing : MonoBehaviour {
         trans = GetComponent<Transform>();
         startPosition = new Vector2(trans.position.x, trans.position.y); // zapisanie początkowego położenia kuli
         if (trans.gameObject.name == "blueProjectile") //w zaleznosci od koloru pocisku, jest zdeterminowana nazwa portalu
-            {
-                color = Color.BLUE;
-                portalName = "bluePortal";
-            }
+        {
+            color = Color.BLUE;
+            portalName = "bluePortal";
+        }
         else if(trans.gameObject.name == "orangeProjectile")
-            {
-                color = Color.ORANGE;
-                portalName = "orangePortal";
-            }
+        {
+            color = Color.ORANGE;
+            portalName = "orangePortal";
+        }
    
     }
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+
 
     void OnTriggerEnter2D(Collider2D col)
     {
@@ -67,11 +64,12 @@ public class portalApearing : MonoBehaviour {
                 Quaternion rotation = col.gameObject.GetComponent<Transform>().rotation; //pobieranie rotacji obiektu z ktorym zaszla kolizjia (sciana)
                                                                                          //tworzenie kopii portalu, z uwzglednieniem pozycji w ktorej sie styknal ze scianal i rotacja w jakiej jest sciana (przyjmuje taką samą rotacje)
                 GameObject newPortal = (GameObject)Instantiate(portal, trans.position, rotation);
+                
                 portalScript newPortalScript = newPortal.GetComponent<portalScript>();
 
                 newPortalScript.wallOn = col;
 
-                Vector3 position = col.gameObject.GetComponent<Transform>().position; //pobieranie pozycji obiektu z ktorym zaszla kolizjia (sciana)
+                Vector3 position = col.gameObject.GetComponent<Transform>().position; //pobieranie pozycji obiektu z ktorym zaszla kolizja (sciana)
                                                                                       //wykrywanie w jakim kierunku leciała kula względem ściany z którą się zderzyła
                 if (rotation.z == 0)
                 {
@@ -84,7 +82,7 @@ public class portalApearing : MonoBehaviour {
                     }
                     else if (startPosition.x < position.x)
                     {
-                        Debug.Log("Kuls leci w prawo!");
+                        //Kula leci w prawo!
                         newPortalScript.facingDirection = portalScript.FacingDirection.Left;
                         newPortal.transform.localEulerAngles = new Vector3(0f, 0f, 180f);
                         newPortal.transform.position = new Vector2(col.transform.position.x - 0.11f, newPortal.transform.position.y);
@@ -114,6 +112,7 @@ public class portalApearing : MonoBehaviour {
                 else if (color == Color.ORANGE)
                     player.orangeOldPortal = newPortal;
 
+                NetworkServer.Spawn(newPortal); 
                 DestroyObject(trans.gameObject); // usuwanie pocisku
             }
         }

@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class portalScript : MonoBehaviour {
+public class portalScript : NetworkBehaviour {
     public enum FacingDirection { Left = 1, Up=4, Right=3, Down=2};
      
     public Collider2D wallOn;
@@ -23,7 +24,7 @@ public class portalScript : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if(!secondPortalFound)
+        if (!secondPortalFound)
         {
             searchForOtherPortal();
         }
@@ -71,7 +72,7 @@ public class portalScript : MonoBehaviour {
     {
         if (active)
         {
-            if (collision.gameObject.tag == "Player")
+            if (collision.gameObject.tag == "PlayerBlue" || collision.gameObject.tag == "PlayerOrange")
             {
                 playerScript player = collision.gameObject.GetComponent<playerScript>();
                 if (!player.mimic)
@@ -184,7 +185,7 @@ public class portalScript : MonoBehaviour {
     {
         if (active)
         {
-            if (collision.gameObject.tag == "Player")
+            if (collision.gameObject.tag == "PlayerBlue" || collision.gameObject.tag == "PlayerOrange")
             {
                 playerScript player = collision.gameObject.GetComponent<playerScript>();
                 if (!player.mimic)
@@ -237,7 +238,7 @@ public class portalScript : MonoBehaviour {
     {
         if (active)
         {
-            if (collision.gameObject.tag == "Player")
+            if (collision.gameObject.tag == "PlayerBlue" || collision.gameObject.tag == "PlayerOrange")
             {
                 Physics2D.IgnoreCollision(collision.gameObject.GetComponent<Collider2D>(), wallOn, false);
                 Physics2D.IgnoreCollision(collision.gameObject.GetComponent<Collider2D>(), oppositeWall, false);
@@ -327,16 +328,23 @@ public class portalScript : MonoBehaviour {
                 if (destroyPlayer)
                 {
                     teleportedCopy.transform.parent = null;
-                    Destroy(collision.gameObject);
+                    Destroy(collision.gameObject); 
                     teleportedCopy.gameObject.GetComponent<playerScript>().mimic = false;
                     teleportedCopy.name = "player";
                     teleportedCopy.gameObject.GetComponent<playerScript>().rend.material.name = "Material";
                     teleportedCopy.gameObject.GetComponent<playerScript>().rend.material.SetInt("_CutDirection", 0);
                     teleportedScript.pendHorizontalMovementChange();
+                    teleportedCopy.gameObject.GetComponent<playerScript>().networkConnection = collision.gameObject.GetComponent<playerScript>().networkConnection;
+                    //zamiana starego obiektu na nowy (jako postać gracza), nowy gameObject jest obsługiwany (ma networkConnection starego)
+                    NetworkServer.ReplacePlayerForConnection(
+                        collision.gameObject.GetComponent<playerScript>().networkConnection, teleportedCopy, 
+                        collision.gameObject.GetComponent<NetworkIdentity>().playerControllerId);
+                    
                 }
                 else if (destroyCopy)
                 {
                     Destroy(teleportedCopy);
+                    player.rend.material.name = "Material";
                     player.rend.material.SetInt("_CutDirection", 0);
                 }
                 collision.GetComponent<portalShooting>().enabled = true;
