@@ -78,12 +78,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\fps.cs" />
-    <Compile Include="Assets\networkManager.cs" />
-    <Compile Include="Assets\playerScript.cs" />
-    <Compile Include="Assets\portalApearing.cs" />
-    <Compile Include="Assets\portalScript.cs" />
-    <Compile Include="Assets\portalShooting.cs" />
+    <Compile Include="Assets\Script\fps.cs" />
+    <Compile Include="Assets\Script\networkManager.cs" />
+    <Compile Include="Assets\Script\playerScript.cs" />
+    <Compile Include="Assets\Script\portalApearing.cs" />
+    <Compile Include="Assets\Script\portalScript.cs" />
+    <Compile Include="Assets\Script\portalShooting.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\SurfaceShader.shader" />
