@@ -6,8 +6,10 @@ using UnityEngine.Networking;
 public class portalScript : NetworkBehaviour {
     public enum FacingDirection { Left = 1, Up=4, Right=3, Down=2};
 
-    public Collider2D wallOn;
-    private Collider2D oppositeWall;
+    [SyncVar]
+    public GameObject wall;
+    //public Collider2D wallOn;
+    private GameObject oppositeWall;
     [HideInInspector] public GameObject secondPortal;
     private GameObject teleportedCopy;
     private playerScript teleportedScript;
@@ -64,21 +66,12 @@ public class portalScript : NetworkBehaviour {
         }
         if (secondPortalFound)
         {
-            oppositeWall = secondPortal.GetComponent<portalScript>().wallOn;
+            oppositeWall = secondPortal.GetComponent<portalScript>().wall;
             secondPortalFacing = secondPortal.GetComponent<portalScript>().facingDirection;
             active = true;
         }
     }
-    
-    /*
-    [ClientRpc]
-    public void RpcIgnoreWallCollision(GameObject collision, GameObject portal)
-    {
-        Physics2D.IgnoreCollision(collision.GetComponent<Collider2D>(), portal.GetComponent<portalScript>().wallOn.GetComponent<Collider2D>());
-        Debug.Log("elo!");
-    }
-    */
-
+ 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (active)
@@ -88,8 +81,7 @@ public class portalScript : NetworkBehaviour {
                 playerScript player = collision.gameObject.GetComponent<playerScript>();
                 if (!player.mimic)
                 {
-                    //RpcIgnoreWallCollision(collision.gameObject, this.gameObject);
-                    Physics2D.IgnoreCollision(collision.gameObject.GetComponent<Collider2D>(), wallOn);
+                    Physics2D.IgnoreCollision(collision.gameObject.GetComponent<Collider2D>(), wall.GetComponent<Collider2D>());
                     if (secondPortalFacing == FacingDirection.Left)
                     {
                         if (this.facingDirection == FacingDirection.Up)
@@ -157,9 +149,11 @@ public class portalScript : NetworkBehaviour {
                         else
                             teleportedScript.GetComponent<Rigidbody2D>().velocity = player.GetComponent<Rigidbody2D>().velocity;
                     }
+                    
 
                     Physics2D.IgnoreCollision(teleportedCopy.gameObject.GetComponent<Collider2D>(), oppositeWall.GetComponent<Collider2D>());
                     teleportedCopy.transform.parent = player.gameObject.transform;
+                        teleportedCopy.GetComponent<portalShooting>().enabled = false;
 
                     teleportedScript.mimic = true;
 
@@ -188,11 +182,12 @@ public class portalScript : NetworkBehaviour {
                         player.rend.material.SetFloat("_CutPos", this.transform.position.y);
                     }
                     collision.GetComponent<portalShooting>().enabled = false;
-                    teleportedCopy.GetComponent<portalShooting>().enabled = false;
+                    
                 }
             }
         }
     }
+
     private void OnTriggerStay2D(Collider2D collision)
     {
         if (active)
@@ -246,14 +241,15 @@ public class portalScript : NetworkBehaviour {
             }
         }
     }
+
     private void OnTriggerExit2D(Collider2D collision)
     {
         if (active)
         {
             if (collision.gameObject.tag == "PlayerBlue" || collision.gameObject.tag == "PlayerOrange")
             {
-                Physics2D.IgnoreCollision(collision.gameObject.GetComponent<Collider2D>(), wallOn, false);
-                Physics2D.IgnoreCollision(collision.gameObject.GetComponent<Collider2D>(), oppositeWall, false);
+                Physics2D.IgnoreCollision(collision.gameObject.GetComponent<Collider2D>(), wall.GetComponent<Collider2D>(), false);
+                Physics2D.IgnoreCollision(collision.gameObject.GetComponent<Collider2D>(), oppositeWall.GetComponent<Collider2D>(), false);
                 bool destroyPlayer = false;
                 bool destroyCopy = false;
                 playerScript player = collision.gameObject.GetComponent<playerScript>();
@@ -274,8 +270,8 @@ public class portalScript : NetworkBehaviour {
                                 else if (secondPortalFacing == FacingDirection.Right)
                                     teleportedScript.GetComponent<Rigidbody2D>().velocity = new Vector2(-player.GetComponent<Rigidbody2D>().velocity.x, player.GetComponent<Rigidbody2D>().velocity.y);
                             }
-                            Physics2D.IgnoreCollision(teleportedScript.GetComponent<Collider2D>(), wallOn, false);
-                            Physics2D.IgnoreCollision(teleportedScript.GetComponent<Collider2D>(), oppositeWall, false);
+                            Physics2D.IgnoreCollision(teleportedScript.GetComponent<Collider2D>(), wall.GetComponent<Collider2D>(), false);
+                            Physics2D.IgnoreCollision(teleportedScript.GetComponent<Collider2D>(), oppositeWall.GetComponent<Collider2D>(), false);
                         }
                         else if (collision.transform.position.x > this.transform.position.x)
                             destroyCopy = true;
@@ -307,8 +303,8 @@ public class portalScript : NetworkBehaviour {
                         if (collision.transform.position.y < this.transform.position.y)
                         {
                             destroyPlayer = true;
-                            Physics2D.IgnoreCollision(teleportedScript.GetComponent<Collider2D>(), wallOn, false);
-                            Physics2D.IgnoreCollision(teleportedScript.GetComponent<Collider2D>(), oppositeWall, false);
+                            Physics2D.IgnoreCollision(teleportedScript.GetComponent<Collider2D>(), wall.GetComponent<Collider2D>(), false);
+                            Physics2D.IgnoreCollision(teleportedScript.GetComponent<Collider2D>(), oppositeWall.GetComponent<Collider2D>(), false);
                             if (!teleportedScript.GetComponent<Rigidbody2D>().simulated)
                             {
                                 teleportedScript.GetComponent<Rigidbody2D>().simulated = true;
@@ -338,21 +334,34 @@ public class portalScript : NetworkBehaviour {
                 player.jumpEnabled = true;
                 if (destroyPlayer)
                 {
+                    /*if(!isServer)
+                    {
+                        Destroy(collision.gameObject); 
+                        Destroy(teleportedCopy); 
+                    }
+                    else{*/
                     teleportedCopy.transform.parent = null;
-                    teleportedCopy.name = collision.gameObject.name;
+                    //teleportedCopy.name = collision.gameObject.name;
                     //pytanie: czy przypisywac nowemu graczowi referencje na portal, ktore wczesniej przechowywal jego oryginal?
                     //
-                    Destroy(collision.gameObject); 
+                    //Destroy(collision.gameObject); 
                     teleportedCopy.gameObject.GetComponent<playerScript>().mimic = false;
                     teleportedCopy.gameObject.GetComponent<playerScript>().rend.material.name = "Material";
                     teleportedCopy.gameObject.GetComponent<playerScript>().rend.material.SetInt("_CutDirection", 0);
                     teleportedScript.pendHorizontalMovementChange();
                     teleportedCopy.gameObject.GetComponent<playerScript>().networkConnection = collision.gameObject.GetComponent<playerScript>().networkConnection;
                     //zamiana starego obiektu na nowy (jako postać gracza), nowy gameObject jest obsługiwany (ma networkConnection starego)
-                    NetworkServer.ReplacePlayerForConnection(
-                        collision.gameObject.GetComponent<playerScript>().networkConnection, teleportedCopy, 
-                        collision.gameObject.GetComponent<NetworkIdentity>().playerControllerId);
-                    
+                    if(isServer)
+                        {
+                        NetworkServer.ReplacePlayerForConnection(
+                            collision.gameObject.GetComponent<playerScript>().networkConnection, teleportedCopy, 
+                            collision.gameObject.GetComponent<NetworkIdentity>().playerControllerId);
+                        Destroy(collision.gameObject); 
+                        }
+                    //if(!isServer)
+                        //Destroy(teleportedCopy); 
+                   
+                                            
                 }
                 else if (destroyCopy)
                 {

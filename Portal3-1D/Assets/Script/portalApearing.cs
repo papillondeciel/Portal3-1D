@@ -74,7 +74,8 @@ public class portalApearing : NetworkBehaviour {
                 
                 portalScript newPortalScript = newPortal.GetComponent<portalScript>();
 
-                newPortalScript.wallOn = col;
+                newPortalScript.wall = col.gameObject;
+                //newPortalScript.wallOn = col;
 
                 Vector3 position = col.gameObject.GetComponent<Transform>().position; //pobieranie pozycji obiektu z ktorym zaszla kolizja (sciana)
                                                                                       //wykrywanie w jakim kierunku leciała kula względem ściany z którą się zderzyła
