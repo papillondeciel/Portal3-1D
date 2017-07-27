@@ -19,7 +19,9 @@ public class portalShooting : NetworkBehaviour {
     private float projectileVelovity;
     //Vector2 cursorPosition = new Vector2(1, 1);
 
+    [SyncVar]
     public GameObject blueOldPortal;
+    [SyncVar]
     public GameObject orangeOldPortal;
     
 

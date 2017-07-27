@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 public class portalScript : NetworkBehaviour {
-    public enum FacingDirection { Left = 1, Up=4, Right=3, Down=2};
+    public enum FacingDirection { Left = 1, Up = 4, Right = 3, Down = 2 };
 
     [SyncVar]
     public GameObject wall;
@@ -19,14 +19,15 @@ public class portalScript : NetworkBehaviour {
     private bool active;
     private FacingDirection secondPortalFacing;
     [HideInInspector] public bool secondPortalFound;
+    public Sprite tempSprite;
     // Use this for initialization
-    void Start () {
+    void Start() {
         particles = this.transform.GetChild(2).GetComponent<ParticleSystem>();
         searchForOtherPortal();
     }
-	
-	// Update is called once per frame
-	void Update () {
+
+    // Update is called once per frame
+    void Update() {
         if (!secondPortalFound)
         {
             searchForOtherPortal();
@@ -71,7 +72,7 @@ public class portalScript : NetworkBehaviour {
             active = true;
         }
     }
- 
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (active)
@@ -113,8 +114,8 @@ public class portalScript : NetworkBehaviour {
                             teleportedScript.invertHorizontalMovement = true;
                         else if (this.facingDirection == FacingDirection.Up)
                             teleportedScript.thrown = true;
-                            
-                       
+
+
                     }
                     else if (secondPortalFacing == FacingDirection.Up)
                     {
@@ -173,7 +174,7 @@ public class portalScript : NetworkBehaviour {
 
     private void OnTriggerStay2D(Collider2D collision)
     {
-        if (active && collision.GetComponent<NetworkIdentity>().isLocalPlayer)
+        if (active /*&& collision.GetComponent<NetworkIdentity>().isLocalPlayer*/)
         {
             if (collision.gameObject.tag == "PlayerBlue" || collision.gameObject.tag == "PlayerOrange")
             {
@@ -346,40 +347,26 @@ public class portalScript : NetworkBehaviour {
                 }
                 if (destroyPlayer)
                 {
-                    /*if(!isServer)
-                    {
-                        Destroy(collision.gameObject); 
-                        Destroy(teleportedCopy); 
-                    }
-                    else{*/
                     teleportedCopy.transform.parent = null;
-                    //teleportedCopy.name = collision.gameObject.name;
-                    //pytanie: czy przypisywac nowemu graczowi referencje na portal, ktore wczesniej przechowywal jego oryginal?
-                    //
-                    //Destroy(collision.gameObject); 
-                    teleportedCopy.gameObject.GetComponent<playerScript>().mimic = false;
-                    teleportedCopy.gameObject.GetComponent<playerScript>().rend.material.name = "Material";
-                    teleportedCopy.gameObject.GetComponent<playerScript>().rend.material.SetInt("_CutDirection", 0);
-                    teleportedScript.pendHorizontalMovementChange();
+                    teleportedCopy.name = collision.gameObject.name;
+                    teleportedCopy.GetComponent<playerScript>().mimic = false;
+                    teleportedCopy.GetComponent<playerScript>().rend.material.name = "Material";
+                    teleportedCopy.GetComponent<playerScript>().rend.material.SetInt("_CutDirection", 0);
                     teleportedCopy.GetComponent<portalShooting>().enabled = true;
-                    Physics2D.IgnoreCollision(teleportedScript.GetComponent<Collider2D>(), wall.GetComponent<Collider2D>(), false);
-                    Physics2D.IgnoreCollision(teleportedScript.GetComponent<Collider2D>(), oppositeWall.GetComponent<Collider2D>(), false);
-                    teleportedCopy.gameObject.GetComponent<playerScript>().networkConnection = collision.gameObject.GetComponent<playerScript>().networkConnection;
-
+                    teleportedScript.pendHorizontalMovementChange();
+                    teleportedCopy.GetComponent<playerScript>().networkConnection = collision.gameObject.GetComponent<playerScript>().networkConnection;
+                    teleportedCopy.GetComponent<Rigidbody2D>().velocity = collision.gameObject.GetComponent<Rigidbody2D>().velocity;
+                    short playerID = collision.gameObject.GetComponent<NetworkIdentity>().playerControllerId;
+                    
                     //zamiana starego obiektu na nowy (jako postać gracza), nowy gameObject jest obsługiwany (ma networkConnection starego)
                     if (isServer)
                     {
-                        NetworkServer.ReplacePlayerForConnection(
-                            collision.gameObject.GetComponent<playerScript>().networkConnection, teleportedCopy,
-                            collision.gameObject.GetComponent<NetworkIdentity>().playerControllerId);
+                        NetworkServer.ReplacePlayerForConnection(teleportedCopy.GetComponent<playerScript>().networkConnection, teleportedCopy, playerID);
+                        //Network.Destroy(collision.gameObject);
                         Destroy(collision.gameObject);
-
                     }
-
-                    //if(!isServer)
-                    //Destroy(teleportedCopy); 
-
-
+                    if (!isServer)
+                        Destroy(teleportedCopy); 
                 }
                 else if (destroyCopy)
                 {
@@ -389,8 +376,11 @@ public class portalScript : NetworkBehaviour {
                     collision.GetComponent<portalShooting>().enabled = true;
                     player.jumpEnabled = true;
                 }
-                
+
             }
         }
     }
+
 }
+
+
