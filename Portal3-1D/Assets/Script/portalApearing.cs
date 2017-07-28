@@ -16,6 +16,8 @@ public class portalApearing : NetworkBehaviour {
     private string portalName;
     private Vector2 startPosition;
 
+    public bool active;
+
    	// Use this for initialization
 	void Start () {
         trans = GetComponent<Transform>();
@@ -118,10 +120,13 @@ public class portalApearing : NetworkBehaviour {
                     DestroyObject(trans.gameObject); // usuwanie pocisku
                     return;
                 }
-
+                
+                if(!active)// jezeli kula nie jest aktywna nie wykonuj dalej, jezeli jest aktywna pozwol stworzyc portal, warunek eliminuje mozliwos stworzenia dwoch portali z jednej kuli
+                    return;
+                active = false;
 
                 Quaternion rotation = col.gameObject.GetComponent<Transform>().rotation; //pobieranie rotacji obiektu z ktorym zaszla kolizjia (sciana)
-                                                                                         //tworzenie kopii portalu, z uwzglednieniem pozycji w ktorej sie styknal ze scianal i rotacja w jakiej jest sciana (przyjmuje taką samą rotacje)
+                //tworzenie kopii portalu, z uwzglednieniem pozycji w ktorej sie styknal ze scianal i rotacja w jakiej jest sciana (przyjmuje taką samą rotacje)
                 GameObject newPortal = (GameObject)Instantiate(portal, trans.position, rotation);
                 
                 portalScript newPortalScript = newPortal.GetComponent<portalScript>();
