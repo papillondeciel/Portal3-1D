@@ -8,7 +8,7 @@ public class portalApearing : NetworkBehaviour {
     private Transform trans;
     public GameObject portal;
     public LayerMask isItWall;
-
+    public float wallOffset = 0.105f;
     //public portalShooting player;
     enum Color{BLUE, ORANGE};
     private Color color;
@@ -41,22 +41,74 @@ public class portalApearing : NetworkBehaviour {
 
             if (IsInLayerMask(col.gameObject.layer, isItWall.value))
             {
+                GameObject bluePortal = GameObject.FindWithTag("BluePortal");
+                GameObject orangePortal = GameObject.FindWithTag("OrangePortal");
                 if (color == Color.BLUE)//usuniecie starego portalu (w zaleznosci, jakiego koloru tworzony jest nowy)
                 {
-                    if (GameObject.FindWithTag("BluePortal"))
+                    if (orangePortal && orangePortal.GetComponent<portalScript>().wall == col.gameObject)
                     {
-                        Destroy(GameObject.FindWithTag("BluePortal"));
-                        if (GameObject.FindWithTag("OrangePortal"))
-                            GameObject.FindWithTag("OrangePortal").GetComponent<portalScript>().secondPortalFound = false;
+                        float minDistance = orangePortal.GetComponent<BoxCollider2D>().size.y * orangePortal.transform.localScale.y;
+                        if (col.transform.rotation.z == 0)
+                        {
+                            float distance = Mathf.Abs(trans.position.y - orangePortal.transform.position.y);
+                            if (distance < minDistance)
+                            {
+                                DestroyObject(trans.gameObject);
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            float distance = Mathf.Abs(trans.position.x - orangePortal.transform.position.x);
+                            if (distance < minDistance)
+                            {
+                                DestroyObject(trans.gameObject);
+                                return;
+                            }
+                        }
+                    }
+                    if (bluePortal)
+                    {
+                        Destroy(bluePortal);
+                        if (orangePortal)
+                        {
+                            orangePortal.GetComponent<portalScript>().secondPortalFound = false;
+                            orangePortal.GetComponent<portalScript>().active = false;
+                        }
                     }
                 }
                 else if (color == Color.ORANGE)
                 {
-                    if (GameObject.FindWithTag("OrangePortal"))
+                    if (bluePortal != null && bluePortal.GetComponent<portalScript>().wall == col.gameObject)
                     {
-                        Destroy(GameObject.FindWithTag("OrangePortal"));
-                        if (GameObject.FindWithTag("BluePortal"))
-                            GameObject.FindWithTag("BluePortal").GetComponent<portalScript>().secondPortalFound = false;
+                        float minDistance = bluePortal.GetComponent<BoxCollider2D>().size.y * bluePortal.transform.localScale.y;
+                        if (col.transform.rotation.z == 0)
+                        {
+                            float distance = Mathf.Abs(trans.position.y - bluePortal.transform.position.y);
+                            if (distance < minDistance)
+                            {
+                                DestroyObject(trans.gameObject);
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            float distance = Mathf.Abs(trans.position.x - bluePortal.transform.position.x);
+                            if (distance < minDistance)
+                            {
+                                DestroyObject(trans.gameObject);
+                                return;
+                            }
+                        }
+                    }
+                    if (orangePortal)
+                    {
+                        Destroy(orangePortal);
+                        if (bluePortal)
+                        {
+                            bluePortal.GetComponent<portalScript>().secondPortalFound = false;
+                            bluePortal.GetComponent<portalScript>().active= false;
+                        }
                     }
                 }
 
@@ -83,34 +135,54 @@ public class portalApearing : NetworkBehaviour {
                 {
                     if (startPosition.x > position.x)
                     {
-                        //Kula leci w lewo!
+                        //Debug.Log("Kula leci w lewo!");
                         newPortalScript.facingDirection = portalScript.FacingDirection.Right;
                         newPortal.transform.localEulerAngles = new Vector3(0f, 0f, 0f);
-                        newPortal.transform.position = new Vector2(col.transform.position.x + 0.11f, newPortal.transform.position.y);
+                        if (newPortal.transform.position.y < col.transform.GetChild(1).position.y)
+                            newPortal.transform.position = new Vector2(col.transform.position.x + wallOffset, col.transform.GetChild(1).position.y);
+                        else if (newPortal.transform.position.y > col.transform.GetChild(0).position.y)
+                            newPortal.transform.position = new Vector2(col.transform.position.x + wallOffset, col.transform.GetChild(0).position.y);
+                        else
+                            newPortal.transform.position = new Vector2(col.transform.position.x + wallOffset, newPortal.transform.position.y);
                     }
                     else if (startPosition.x < position.x)
                     {
-                        //Kula leci w prawo!
+                        //Debug.Log("Kula leci w prawo!");
                         newPortalScript.facingDirection = portalScript.FacingDirection.Left;
                         newPortal.transform.localEulerAngles = new Vector3(0f, 0f, 180f);
-                        newPortal.transform.position = new Vector2(col.transform.position.x - 0.11f, newPortal.transform.position.y);
+                        if (newPortal.transform.position.y < col.transform.GetChild(1).position.y)
+                            newPortal.transform.position = new Vector2(col.transform.position.x - wallOffset, col.transform.GetChild(1).position.y);
+                        else if (newPortal.transform.position.y > col.transform.GetChild(0).position.y)
+                            newPortal.transform.position = new Vector2(col.transform.position.x - wallOffset, col.transform.GetChild(0).position.y);
+                        else
+                            newPortal.transform.position = new Vector2(col.transform.position.x - wallOffset, newPortal.transform.position.y);
                     }
                 }
                 else
                 {
                     if (startPosition.y > position.y)
                     {
-                        //Kula leci w dół!
+                        //Debug.Log("Kula leci w dół!");
                         newPortalScript.facingDirection = portalScript.FacingDirection.Up;
                         newPortal.transform.localEulerAngles = new Vector3(0f, 0f, 90f);
-                        newPortal.transform.position = new Vector2(newPortal.transform.position.x, col.transform.position.y + 0.11f);
+                        if (newPortal.transform.position.x < col.transform.GetChild(0).position.x)
+                            newPortal.transform.position = new Vector2(col.transform.GetChild(0).position.x, col.transform.position.y + wallOffset);
+                        else if (newPortal.transform.position.x > col.transform.GetChild(1).position.x)
+                            newPortal.transform.position = new Vector2(col.transform.GetChild(1).position.x, col.transform.position.y + wallOffset);
+                        else
+                            newPortal.transform.position = new Vector2(newPortal.transform.position.x, col.transform.position.y + wallOffset);
                     }
                     else if (startPosition.y < position.y)
                     {
-                        //Kula leci w górę!
+                        //Debug.Log("Kula leci w górę!");
                         newPortalScript.facingDirection = portalScript.FacingDirection.Down;
                         newPortal.transform.localEulerAngles = new Vector3(0f, 0f, -90f);
-                        newPortal.transform.position = new Vector2(newPortal.transform.position.x, col.transform.position.y - 0.11f);
+                        if (newPortal.transform.position.x < col.transform.GetChild(0).position.x)
+                            newPortal.transform.position = new Vector2(col.transform.GetChild(0).position.x, col.transform.position.y - wallOffset);
+                        else if (newPortal.transform.position.x > col.transform.GetChild(1).position.x)
+                            newPortal.transform.position = new Vector2(col.transform.GetChild(1).position.x, col.transform.position.y - wallOffset);
+                        else
+                            newPortal.transform.position = new Vector2(newPortal.transform.position.x, col.transform.position.y - wallOffset);
                     }
                 }
 

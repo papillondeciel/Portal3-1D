@@ -8,6 +8,8 @@ public class playerScript : NetworkBehaviour {
     private float maxSpeed = 12f;
     private float maxJump = 12f;
     private float moveForce = 120f;
+    public float velocityX = 0;
+    public float velocityY = 0;
     public float maxFallingSpeed=-35;
     public bool jumpEnabled = true;
     private Rigidbody2D rg2d;
@@ -45,6 +47,8 @@ public class playerScript : NetworkBehaviour {
                 pendInvertHorizontal = false;
             }
         }
+        velocityX = rg2d.velocity.x;
+        velocityY = rg2d.velocity.y;
     }
     private void Jump()
     {

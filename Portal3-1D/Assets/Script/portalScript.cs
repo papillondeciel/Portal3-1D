@@ -16,7 +16,7 @@ public class portalScript : NetworkBehaviour {
     private ParticleSystem particles;
     [SyncVar]
     public FacingDirection facingDirection;
-    private bool active;
+    public bool active;
     private FacingDirection secondPortalFacing;
     [HideInInspector] public bool secondPortalFound;
     public Sprite tempSprite;
@@ -131,8 +131,8 @@ public class portalScript : NetworkBehaviour {
                         teleportedScript = teleportedCopy.GetComponent<playerScript>();
                         teleportedScript.rend.material.SetInt("_CutDirection", (int)FacingDirection.Down);
                         teleportedScript.rend.material.SetFloat("_CutPos", secondPortal.transform.position.y);
-                        if (this.facingDirection == FacingDirection.Right || this.facingDirection == FacingDirection.Left)
-                            teleportedScript.thrown = true;
+                        //if (this.facingDirection == FacingDirection.Right || this.facingDirection == FacingDirection.Left)
+                        //    teleportedScript.thrown = true;
                     }
 
                     Physics2D.IgnoreCollision(teleportedCopy.gameObject.GetComponent<Collider2D>(), oppositeWall.GetComponent<Collider2D>());
@@ -353,20 +353,26 @@ public class portalScript : NetworkBehaviour {
                     teleportedCopy.GetComponent<playerScript>().rend.material.name = "Material";
                     teleportedCopy.GetComponent<playerScript>().rend.material.SetInt("_CutDirection", 0);
                     teleportedCopy.GetComponent<portalShooting>().enabled = true;
-                    teleportedScript.pendHorizontalMovementChange();
+                    //teleportedScript.pendHorizontalMovementChange();
                     teleportedCopy.GetComponent<playerScript>().networkConnection = collision.gameObject.GetComponent<playerScript>().networkConnection;
-                    teleportedCopy.GetComponent<Rigidbody2D>().velocity = collision.gameObject.GetComponent<Rigidbody2D>().velocity;
+                    //teleportedCopy.GetComponent<Rigidbody2D>().velocity = collision.gameObject.GetComponent<Rigidbody2D>().velocity;
                     short playerID = collision.gameObject.GetComponent<NetworkIdentity>().playerControllerId;
-                    
                     //zamiana starego obiektu na nowy (jako postać gracza), nowy gameObject jest obsługiwany (ma networkConnection starego)
-                    if (isServer)
-                    {
-                        NetworkServer.ReplacePlayerForConnection(teleportedCopy.GetComponent<playerScript>().networkConnection, teleportedCopy, playerID);
-                        //Network.Destroy(collision.gameObject);
-                        Destroy(collision.gameObject);
-                    }
-                    if (!isServer)
-                        Destroy(teleportedCopy); 
+                    collision.gameObject.transform.position = teleportedCopy.transform.position;
+                    collision.gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(teleportedCopy.GetComponent<Rigidbody2D>().velocity.x, teleportedCopy.GetComponent<Rigidbody2D>().velocity.y);
+                    player.thrown = teleportedScript.thrown;
+                    player.invertHorizontalMovement = teleportedScript.invertHorizontalMovement;
+                    player.pendHorizontalMovementChange();
+                    collision.GetComponent<portalShooting>().enabled = true;
+                    player.jumpEnabled = true;
+                    //if (isServer)
+                    //{
+                    //    NetworkServer.ReplacePlayerForConnection(teleportedCopy.GetComponent<playerScript>().networkConnection, teleportedCopy, playerID);
+                    //    //Network.Destroy(collision.gameObject);
+                    //    Destroy(collision.gameObject);
+                    //}
+                    //if (!isServer)
+                    Destroy(teleportedCopy);
                 }
                 else if (destroyCopy)
                 {
