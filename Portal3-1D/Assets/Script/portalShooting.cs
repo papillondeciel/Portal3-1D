@@ -2,20 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
-
+[RequireComponent(typeof(AudioSource))]
 public class portalShooting : NetworkBehaviour {
 
     enum PlayerColor {Blue, Orange, None};
-    private PlayerColor playerColor = PlayerColor.None; 
-
+    private PlayerColor playerColor = PlayerColor.None;
+    private audioSync audioS;
     private Transform playerTrans;
-
     public GameObject blueProjectilePrefab;
     public GameObject orangeProjectilePrefab;
-
     private float projectileVelovity;
     //Vector2 cursorPosition = new Vector2(1, 1);
-
+    private AudioSource audioSource;
     [SyncVar]
     public GameObject blueOldPortal;
     [SyncVar]
@@ -30,6 +28,7 @@ public class portalShooting : NetworkBehaviour {
             playerColor = PlayerColor.Blue;
         else if(tag == "PlayerOrange")
             playerColor = PlayerColor.Orange;
+        audioS = GetComponent<audioSync>();
         
     }
 	
@@ -40,7 +39,11 @@ public class portalShooting : NetworkBehaviour {
             if (Input.GetMouseButtonDown(1))//prawy przycisk myszy 
             {
                 Vector2 cursorPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition); //pobranie pozycji kursora myszki
-                CmdShoot(playerColor, cursorPosition); 
+                CmdShoot(playerColor, cursorPosition);
+                if (playerColor == PlayerColor.Blue)
+                    audioS.playSound(0);
+                else
+                    audioS.playSound(1);
                 //Debug.Log("Work Or Not?");
             }
         }
