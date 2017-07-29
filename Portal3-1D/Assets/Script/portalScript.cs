@@ -19,7 +19,7 @@ public class portalScript : NetworkBehaviour {
     public bool active;
     private FacingDirection secondPortalFacing;
     [HideInInspector] public bool secondPortalFound;
-    public Sprite tempSprite;
+
     // Use this for initialization
     void Start() {
         particles = this.transform.GetChild(2).GetComponent<ParticleSystem>();
@@ -355,9 +355,6 @@ public class portalScript : NetworkBehaviour {
                     teleportedCopy.GetComponent<portalShooting>().enabled = true;
                     //teleportedScript.pendHorizontalMovementChange();
                     teleportedCopy.GetComponent<playerScript>().networkConnection = collision.gameObject.GetComponent<playerScript>().networkConnection;
-                    //teleportedCopy.GetComponent<Rigidbody2D>().velocity = collision.gameObject.GetComponent<Rigidbody2D>().velocity;
-                    short playerID = collision.gameObject.GetComponent<NetworkIdentity>().playerControllerId;
-                    //zamiana starego obiektu na nowy (jako postać gracza), nowy gameObject jest obsługiwany (ma networkConnection starego)
                     collision.gameObject.transform.position = teleportedCopy.transform.position;
                     collision.gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(teleportedCopy.GetComponent<Rigidbody2D>().velocity.x, teleportedCopy.GetComponent<Rigidbody2D>().velocity.y);
                     player.thrown = teleportedScript.thrown;
@@ -365,13 +362,6 @@ public class portalScript : NetworkBehaviour {
                     player.pendHorizontalMovementChange();
                     collision.GetComponent<portalShooting>().enabled = true;
                     player.jumpEnabled = true;
-                    //if (isServer)
-                    //{
-                    //    NetworkServer.ReplacePlayerForConnection(teleportedCopy.GetComponent<playerScript>().networkConnection, teleportedCopy, playerID);
-                    //    //Network.Destroy(collision.gameObject);
-                    //    Destroy(collision.gameObject);
-                    //}
-                    //if (!isServer)
                     Destroy(teleportedCopy);
                 }
                 else if (destroyCopy)

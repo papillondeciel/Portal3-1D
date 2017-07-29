@@ -5,7 +5,7 @@ using UnityEngine.Networking;
 
 public class playerScript : NetworkBehaviour {
 
-    private float maxSpeed = 12f;
+    public float maxSpeed = 12f;
     private float maxJump = 12f;
     private float moveForce = 120f;
     public float velocityX = 0;

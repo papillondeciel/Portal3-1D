@@ -78,6 +78,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Script\cameraOperator.cs" />
     <Compile Include="Assets\Script\fps.cs" />
     <Compile Include="Assets\Script\networkManager.cs" />
     <Compile Include="Assets\Script\playerScript.cs" />
