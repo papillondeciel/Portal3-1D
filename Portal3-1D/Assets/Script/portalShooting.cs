@@ -12,6 +12,7 @@ public class portalShooting : NetworkBehaviour {
     public GameObject blueProjectilePrefab;
     public GameObject orangeProjectilePrefab;
     private float projectileVelovity;
+    private Transform endOfGun;
     //Vector2 cursorPosition = new Vector2(1, 1);
     private AudioSource audioSource;
     [SyncVar]
@@ -29,7 +30,7 @@ public class portalShooting : NetworkBehaviour {
         else if(tag == "PlayerOrange")
             playerColor = PlayerColor.Orange;
         audioS = GetComponent<audioSync>();
-        
+        endOfGun = this.gameObject.transform.GetChild(1).GetChild(0);
     }
 	
 	// Update is called once per frame
@@ -57,7 +58,7 @@ public class portalShooting : NetworkBehaviour {
         if(playerColor == PlayerColor.Blue)//jeżeli gracz jest niebieski
         {
             //tworzenie kopii pocisku, o początku w obecnej pozycji gracza, i rotacji identycznej do niego (rotacja przy pocisku jest nieistotna jeżeli docelowo pocisk będzie kulą a nie kwadratem)
-            bullet = (GameObject)Instantiate(blueProjectilePrefab, playerTrans.position, Quaternion.identity);
+            bullet = (GameObject)Instantiate(blueProjectilePrefab, endOfGun.position, Quaternion.identity);
             bullet.name = "blueProjectile"; //nazwa pocisku
         }
         else if(playerColor == PlayerColor.Orange)//jeżeli gracz jest pomaranczowy

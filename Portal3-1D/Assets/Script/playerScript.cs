@@ -34,6 +34,8 @@ public class playerScript : NetworkBehaviour {
         rend = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
         rg2d.freezeRotation = true;
+        //wyłączenie menu dotyczącego Networkingu
+        GameObject.Find("Network Manager").GetComponent<NetworkManagerHUD>().showGUI = false;
     }
 	
 	void Update () {

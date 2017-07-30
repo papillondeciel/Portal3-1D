@@ -30,7 +30,6 @@ public class networkManager : NetworkManager {
 
         var player = (GameObject)GameObject.Instantiate(playerPrefab, playerPrefabTransform.position, Quaternion.identity);
         player.GetComponent<playerScript>().networkConnection = conn;
-        //player.name = "player";
 
         if (GameObject.FindWithTag("OrangePortal"))
             player.GetComponent<portalShooting>().orangeOldPortal = GameObject.FindWithTag("OrangePortal");
