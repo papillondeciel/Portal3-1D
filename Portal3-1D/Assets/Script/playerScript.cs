@@ -23,11 +23,14 @@ public class playerScript : NetworkBehaviour {
     float groundRadius = 0.2f;
     public LayerMask whatIsGround;
     public NetworkConnection networkConnection;
+    public Animator animator;
+    bool moving = false;
 
     // Use this for initialization
     void Start () {
         rg2d = GetComponent<Rigidbody2D>();
         rend = GetComponent<SpriteRenderer>();
+        animator = GetComponent<Animator>();
         rg2d.freezeRotation = true;
     }
 	
@@ -47,11 +50,30 @@ public class playerScript : NetworkBehaviour {
                 pendInvertHorizontal = false;
             }
         }
+        if (Input.GetAxis("Horizontal") == 0 || !grounded)
+        {
+            moving = false;
+            
+        }
+        if(Input.GetAxis("Horizontal") > 0 && grounded )
+        {
+            //animator.Play("walking");
+            moving = true;
+            rend.flipX = false;
+        }
+        else if (Input.GetAxis("Horizontal") < 0 && grounded)
+        {
+            //animator.Play("walking");
+            moving = true;
+            rend.flipX = true;
+        }
         velocityX = rg2d.velocity.x;
         velocityY = rg2d.velocity.y;
     }
     private void Jump()
     {
+        animator.Play("idlejump");
+        animator.Play("idlejump1");
         Vector2 resolvedJump = new Vector2(rg2d.velocity.x, maxJump);
         rg2d.AddForce(resolvedJump, ForceMode2D.Impulse);
     }
@@ -61,6 +83,7 @@ public class playerScript : NetworkBehaviour {
         if (!isLocalPlayer) 
             return;
 
+        animator.enabled = false;
         grounded = Physics2D.OverlapCircle(groundCheck.position, groundRadius, whatIsGround);
         float move = Input.GetAxis("Horizontal");
         if (invertHorizontalMovement)
@@ -80,6 +103,16 @@ public class playerScript : NetworkBehaviour {
             if (Mathf.Abs(rg2d.velocity.x) > maxSpeed)
                 rg2d.velocity = new Vector2(Mathf.Sign(rg2d.velocity.x) * maxSpeed, rg2d.velocity.y);
         }
+        if (moving)
+        {
+            animator.enabled = true;
+            //animator.Play("walking");
+            //animator.Play("walking2");
+        }
+        //else
+        //{
+        //    animator.Play("idle");
+        //}
     }
 
     public void pendHorizontalMovementChange()
