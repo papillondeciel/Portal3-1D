@@ -81,6 +81,7 @@
     <Compile Include="Assets\Script\audioSync.cs" />
     <Compile Include="Assets\Script\cameraOperator.cs" />
     <Compile Include="Assets\Script\fps.cs" />
+    <Compile Include="Assets\Script\handgun.cs" />
     <Compile Include="Assets\Script\networkManager.cs" />
     <Compile Include="Assets\Script\playerScript.cs" />
     <Compile Include="Assets\Script\portalApearing.cs" />
