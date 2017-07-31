@@ -24,7 +24,6 @@ public class playerScript : NetworkBehaviour {
     public Animator animator;
     bool facingRight = true;
     bool isPaused = false;
-    //handgun
     Vector3 left = new Vector3(-0.21f, 0.5f, 0);
     Vector3 right = new Vector3(-0.21f, -0.5f, 0);
 
@@ -34,7 +33,6 @@ public class playerScript : NetworkBehaviour {
         rend = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
         rg2d.freezeRotation = true;
-        //wyłączenie menu dotyczącego Networkingu
         GameObject.Find("Network Manager").GetComponent<NetworkManagerHUD>().showGUI = false;
     }
 	
@@ -72,8 +70,6 @@ public class playerScript : NetworkBehaviour {
     }
     private void Jump()
     {
-        //animator.Play("idlejump");
-        //animator.Play("idlejump1");
         Vector2 resolvedJump = new Vector2(rg2d.velocity.x, maxJump);
         rg2d.AddForce(resolvedJump, ForceMode2D.Impulse);
     }
@@ -83,7 +79,6 @@ public class playerScript : NetworkBehaviour {
         if (!isLocalPlayer) 
             return;
 
-        //animator.enabled = false;
         grounded = Physics2D.OverlapCircle(groundCheck.position, groundRadius, whatIsGround);
         float move = Input.GetAxis("Horizontal");
         if (invertHorizontalMovement)
@@ -120,13 +115,7 @@ public class playerScript : NetworkBehaviour {
     {
         pendInvertHorizontal = true;
     }
-    public void Flip()
-    {
-        facingRight = !facingRight;
-        Vector3 theScale = transform.localScale;
-        theScale.x *= -1;
-        transform.localScale = theScale;
-    }
+    
     void OnApplicationFocus(bool hasFocus)
     {
         isPaused = !hasFocus;
@@ -136,7 +125,13 @@ public class playerScript : NetworkBehaviour {
     {
         isPaused = pauseStatus;
     }
-
+    public void Flip()
+    {
+        facingRight = !facingRight;
+        Vector3 theScale = transform.localScale;
+        theScale.x *= -1;
+        transform.localScale = theScale;
+    }
     [Command]
     public void CmdFlipCharacter()
     {
@@ -150,5 +145,6 @@ public class playerScript : NetworkBehaviour {
         theScale.x *= -1;
         transform.localScale = theScale;
     }
+
 
 }

@@ -9,10 +9,10 @@ public class portalShooting : NetworkBehaviour {
     private PlayerColor playerColor = PlayerColor.None;
     private audioSync audioS;
     private Transform playerTrans;
+    public Transform handgunMarker;
     public GameObject blueProjectilePrefab;
     public GameObject orangeProjectilePrefab;
     private float projectileVelovity;
-    private Transform endOfGun;
     //Vector2 cursorPosition = new Vector2(1, 1);
     private AudioSource audioSource;
     [SyncVar]
@@ -30,14 +30,14 @@ public class portalShooting : NetworkBehaviour {
         else if(tag == "PlayerOrange")
             playerColor = PlayerColor.Orange;
         audioS = GetComponent<audioSync>();
-        endOfGun = this.gameObject.transform.GetChild(1).GetChild(0);
+        
     }
 	
 	// Update is called once per frame
 	void Update () {
         if(isLocalPlayer) // jezeli skrypt jest wykonywany przez lokalnego gracza, sprawdz czy gracz nacisnał klawisz myszki by wystrzelić pocisk
         {
-            if (Input.GetMouseButtonDown(1))//prawy przycisk myszy 
+            if (Input.GetMouseButtonDown(0))//prawy przycisk myszy 
             {
                 Vector2 cursorPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition); //pobranie pozycji kursora myszki
                 CmdShoot(playerColor, cursorPosition);
@@ -58,20 +58,20 @@ public class portalShooting : NetworkBehaviour {
         if(playerColor == PlayerColor.Blue)//jeżeli gracz jest niebieski
         {
             //tworzenie kopii pocisku, o początku w obecnej pozycji gracza, i rotacji identycznej do niego (rotacja przy pocisku jest nieistotna jeżeli docelowo pocisk będzie kulą a nie kwadratem)
-            bullet = (GameObject)Instantiate(blueProjectilePrefab, endOfGun.position, Quaternion.identity);
+            bullet = (GameObject)Instantiate(blueProjectilePrefab, handgunMarker.position, Quaternion.identity);
             bullet.name = "blueProjectile"; //nazwa pocisku
         }
         else if(playerColor == PlayerColor.Orange)//jeżeli gracz jest pomaranczowy
         {
             //tworzenie kopii pocisku, o początku w obecnej pozycji gracza, i rotacji identycznej do niego (rotacja przy pocisku jest nieistotna jeżeli doccelowo pocisk będzie kulą a nie kwadratem)
-            bullet = (GameObject)Instantiate(orangeProjectilePrefab, playerTrans.position, Quaternion.identity);
+            bullet = (GameObject)Instantiate(orangeProjectilePrefab, handgunMarker.position, Quaternion.identity);
             bullet.name = "orangeProjectile";//nazwa pocisku
         }
         bullet.GetComponent<portalApearing>().active = true;
         //forth to długość wektora jaki został wyznaczony przez naciśnięcie myszki (od srodka gracza - do miejsca naciśnięcia myszki)
-        float forth = Mathf.Sqrt((cursorPosition.y - playerTrans.position.y) * (cursorPosition.y - playerTrans.position.y) + (cursorPosition.x - playerTrans.position.x) * (cursorPosition.x - playerTrans.position.x));
+        float forth = Mathf.Sqrt((cursorPosition.y - handgunMarker.position.y) * (cursorPosition.y - handgunMarker.position.y) + (cursorPosition.x - handgunMarker.position.x) * (cursorPosition.x - handgunMarker.position.x));
         //nadanie kuli jednostajnej prędkości
-        bullet.GetComponent<Rigidbody2D>().velocity = new Vector2((cursorPosition.x - playerTrans.position.x), (cursorPosition.y - playerTrans.position.y)) * Time.deltaTime * projectileVelovity / forth;
+        bullet.GetComponent<Rigidbody2D>().velocity = new Vector2((cursorPosition.x - handgunMarker.position.x), (cursorPosition.y - handgunMarker.position.y)) * Time.deltaTime * projectileVelovity / forth;
         NetworkServer.Spawn(bullet); // Spawn the bullet on the Clients
                        
     }

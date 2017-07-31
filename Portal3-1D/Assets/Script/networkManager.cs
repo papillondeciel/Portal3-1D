@@ -6,6 +6,7 @@ public class networkManager : NetworkManager {
     public GameObject playerBlue;
     public Transform playerBlueTransform;
     public GameObject playerOrange;
+    public Transform spawnPointBlue, spawnPointOrange;
     public Transform playerOrangeTransform;
     private Transform playerPrefabTransform;
     private enum Player { Blue, Orange };
@@ -18,18 +19,19 @@ public class networkManager : NetworkManager {
         {
             Debug.Log("OnServerAddPlayer BLUE!");
             playerPrefab = playerBlue;
-            playerPrefabTransform = playerBlueTransform;
+            playerPrefabTransform = spawnPointBlue;
             colorPlayer = Player.Orange;
         }
         else if (colorPlayer == Player.Orange)
         {
             Debug.Log("OnServerAddPlayer ORANGE!");
             playerPrefab = playerOrange;
-            playerPrefabTransform = playerOrangeTransform;
+            playerPrefabTransform = spawnPointOrange;
         }
 
         var player = (GameObject)GameObject.Instantiate(playerPrefab, playerPrefabTransform.position, Quaternion.identity);
         player.GetComponent<playerScript>().networkConnection = conn;
+        //player.name = "player";
 
         if (GameObject.FindWithTag("OrangePortal"))
             player.GetComponent<portalShooting>().orangeOldPortal = GameObject.FindWithTag("OrangePortal");
@@ -42,6 +44,7 @@ public class networkManager : NetworkManager {
             player.GetComponent<portalShooting>().blueOldPortal = null;
 
         NetworkServer.AddPlayerForConnection(conn, player, playerControllerId);
+        
     }
 
     public override void OnStopServer()

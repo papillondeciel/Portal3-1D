@@ -36,28 +36,15 @@ public class cameraOperator : NetworkBehaviour {
     {
         if(isLocalPlayer)
         {
-            //camera.transform.Translate(new Vector3(0,0,0) * Time.deltaTime, Space.World);
-            //camera.TransformPoint(-4, -5, -20);//position = new Vector3(-4, 4, -20);
-            //camera.transform.position = new Vector3(-4, 4, -20);
-
-            if(player.position.x >= rightMaker.position.x)
-            {
-                camera.transform.Translate(Vector3.right * Time.deltaTime * maxSpeed, Space.World);
-            }   
-            else if(player.position.x <= leftMaker.position.x)
-            {
-                camera.transform.Translate(Vector3.left * Time.deltaTime * maxSpeed, Space.World);
-            }
+            if(player.position.x >= rightMaker.position.x) 
+                camera.transform.Translate(Vector3.right * Time.deltaTime * maxSpeed, Space.World); 
+            else if(player.position.x <= leftMaker.position.x) 
+                camera.transform.Translate(Vector3.left * Time.deltaTime * maxSpeed, Space.World); 
 
             if(player.position.y >= topMaker.position.y)
-            {
-                camera.transform.Translate(Vector3.up * Time.deltaTime * maxSpeed, Space.World);
-            }   
-            else if(player.position.y <= downMaker.position.y)
-            {
-                //Debug.Log("player.y: " + player.position.y + " downMaker.y: " + downMaker.position.y);
-                camera.transform.Translate(Vector3.down * Time.deltaTime * maxSpeed, Space.World);
-            }
+                camera.transform.Translate(Vector3.up * Time.deltaTime * maxSpeed, Space.World); 
+            else if(player.position.y <= downMaker.position.y) 
+                camera.transform.Translate(Vector3.down * Time.deltaTime * maxSpeed, Space.World); 
         }
     }
 

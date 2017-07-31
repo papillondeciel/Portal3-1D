@@ -80,13 +80,14 @@
   <ItemGroup>
     <Compile Include="Assets\Script\audioSync.cs" />
     <Compile Include="Assets\Script\cameraOperator.cs" />
+    <Compile Include="Assets\Script\EndArea.cs" />
     <Compile Include="Assets\Script\fps.cs" />
-    <Compile Include="Assets\Script\handgun.cs" />
     <Compile Include="Assets\Script\networkManager.cs" />
     <Compile Include="Assets\Script\playerScript.cs" />
     <Compile Include="Assets\Script\portalApearing.cs" />
     <Compile Include="Assets\Script\portalScript.cs" />
     <Compile Include="Assets\Script\portalShooting.cs" />
+    <Compile Include="Assets\Script\Text.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\SurfaceShader.shader" />

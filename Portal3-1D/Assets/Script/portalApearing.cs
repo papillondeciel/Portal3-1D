@@ -37,7 +37,7 @@ public class portalApearing : NetworkBehaviour {
 
     void OnTriggerEnter2D(Collider2D col)
     {
-        if (col.tag != "Portal collider")
+        if (col.tag != "Portal collider" && col.tag != "Non portalable")
         {
             Vector2 velocity = GetComponent<Rigidbody2D>().velocity;
 
@@ -212,6 +212,11 @@ public class portalApearing : NetworkBehaviour {
                 NetworkServer.Spawn(newPortal); 
                 DestroyObject(trans.gameObject); // usuwanie pocisku
             }
+        }
+        else if(col.tag == "Non portalable")
+        {
+            Destroy(this.gameObject);
+            return;
         }
     }
 
