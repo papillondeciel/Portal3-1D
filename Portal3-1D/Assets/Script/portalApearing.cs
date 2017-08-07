@@ -43,33 +43,35 @@ public class portalApearing : NetworkBehaviour {
 
             if (IsInLayerMask(col.gameObject.layer, isItWall.value))
             {
-                GameObject bluePortal = GameObject.FindWithTag("BluePortal");
+                GameObject bluePortal = GameObject.FindWithTag("BluePortal"); //przypisuje zmiennym pomocniczym referencje na obecnie działające portale
                 GameObject orangePortal = GameObject.FindWithTag("OrangePortal");
                 if (color == Color.BLUE)//usuniecie starego portalu (w zaleznosci, jakiego koloru tworzony jest nowy)
                 {
                     if (orangePortal && orangePortal.GetComponent<portalScript>().wall == col.gameObject)
                     {
-                        float minDistance = orangePortal.GetComponent<BoxCollider2D>().size.y * orangePortal.transform.localScale.y;
-                        if (col.transform.rotation.z == 0)
+                        //kod uniemożliwający nakładanie się portali
+
+                        float minDistance = orangePortal.GetComponent<BoxCollider2D>().size.y * orangePortal.transform.localScale.y; //obliczanie minimalnego możliwego dystansu między portalami
+                        if (col.transform.rotation.z == 0) // dla portali pionowych
                         {
                             float distance = Mathf.Abs(trans.position.y - orangePortal.transform.position.y);
-                            if (distance < minDistance)
+                            if (distance < minDistance) // jeżeli kula trafiła w miejsce w którym portal nie powinien się pojawić usuwam kulę
                             {
                                 DestroyObject(trans.gameObject);
                                 return;
                             }
                         }
-                        else
+                        else //i portali poziomych
                         {
                             float distance = Mathf.Abs(trans.position.x - orangePortal.transform.position.x);
-                            if (distance < minDistance)
+                            if (distance < minDistance) // jeżeli kula trafiła w miejsce w którym portal nie powinien się pojawić usuwam kulę
                             {
                                 DestroyObject(trans.gameObject);
                                 return;
                             }
                         }
                     }
-                    if (bluePortal)
+                    if (bluePortal) //po znisczeniu portalu o przeciwnym kolorze ustawiam bieżący na nieaktywny i włączam szukanie przeciwnego portalu
                     {
                         Destroy(bluePortal);
                         if (orangePortal)
@@ -79,10 +81,12 @@ public class portalApearing : NetworkBehaviour {
                         }
                     }
                 }
-                else if (color == Color.ORANGE)
+                else if (color == Color.ORANGE) //usuniecie starego portalu (w zaleznosci, jakiego koloru tworzony jest nowy)
                 {
                     if (bluePortal != null && bluePortal.GetComponent<portalScript>().wall == col.gameObject)
-                    {
+                    {                        
+                        //kod uniemożliwający nakładanie się portali jak wyżej tylko dla pomarańczowego portalu
+
                         float minDistance = bluePortal.GetComponent<BoxCollider2D>().size.y * bluePortal.transform.localScale.y;
                         if (col.transform.rotation.z == 0)
                         {
@@ -103,7 +107,7 @@ public class portalApearing : NetworkBehaviour {
                             }
                         }
                     }
-                    if (orangePortal)
+                    if (orangePortal) //po znisczeniu portalu o przeciwnym kolorze ustawiam bieżący na nieaktywny i włączam szukanie przeciwnego portalu
                     {
                         Destroy(orangePortal);
                         if (bluePortal)
@@ -138,6 +142,9 @@ public class portalApearing : NetworkBehaviour {
                                                                                       //wykrywanie w jakim kierunku leciała kula względem ściany z którą się zderzyła
                 if (rotation.z == 0)
                 {
+                    //niżej pozycjonowanie portalu na ścianie w zależności od rotacji ściany i kierunku lotu kuli
+                    //obsługa znaczników na ścianach aby portal nie tworzył się poza brzegiem ściany
+
                     if (startPosition.x > position.x)
                     {
                         //Debug.Log("Kula leci w lewo!");
