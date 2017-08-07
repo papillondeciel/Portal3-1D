@@ -147,8 +147,6 @@ public class portalScript : NetworkBehaviour {
                         teleportedScript = teleportedCopy.GetComponent<playerScript>();
                         teleportedScript.rend.material.SetInt("_CutDirection", (int)FacingDirection.Down);
                         teleportedScript.rend.material.SetFloat("_CutPos", secondPortal.transform.position.y);
-                        //if (this.facingDirection == FacingDirection.Right || this.facingDirection == FacingDirection.Left)
-                        //    teleportedScript.thrown = true;
                         teleportedCopy.transform.GetChild(1).GetComponent<SpriteRenderer>().material.SetInt("_CutDirection", (int)FacingDirection.Down);
                         teleportedCopy.transform.GetChild(1).GetComponent<SpriteRenderer>().material.SetFloat("_CutPos", this.transform.position.y);
                     }

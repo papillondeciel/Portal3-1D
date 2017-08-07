@@ -1,0 +1,27 @@
+
+1. temat projektu 
+Celem projektu było stworzenie gry platformowo-logicznej bazującej na grze Portal2.
+Jest to gra kooperacyjna dla dwóch graczy wykorzystująca lokalną sieć.
+Gracze (każdy sterujący jedną postacią) mają do dyspozycji jeden portal danego koloru, za ich pomocą muszą przemieszczać się w korytarzu zastawionym przez różne elementy, utrudniające normalne przejście.
+
+2. Użyte metody i funkcje w celu uzyskanie odpowiedniej funkcjonalności
+void CmdShoot(PlayerColor playerColor, Vector2 cursorPosition) - wywołanie komendy na serwerze, prefiks "Cmd" świadczy o tym że dana metoda może być wykonana tylko przez serwer, [Command] -> client wysyła żadanie na serwer by ten wykonał następującą motodę -> wystrzelił pocisk
+bool IsInLayerMask(int layer, LayerMask layermask) - sprawdzenie czy dany 'layer' znajduje się w tych podanych do skryptu ('layermask')
+void OnTriggerEnter2D(Collider2D) – odpowiada za obsługę wejścia w kolizje obiektu z 'triggerem'
+void OnTriggerStay2D(Collider2D) – odpowiada za obsługę zdarzenia w którym obiekt z którym koliduje 'trigger' cały czas go dotyka
+void OnTriggerExit2D(Collider2D) – odpowiada za obsługę zdarzenia wyjścia z kolizji z 'triggerem'
+Physics2D.IgnoreCollision(Collider2D collider1, Collider2D collider2) – wyłącza kolizje dwóch danych obiektów zawierających składnik Collider2D lub po nim dziedziczącym
+SpriteRenderer.material.SetInt("_CutDirection", FacingDirection) –  funkcja służy do obsługi utworzonego przez nas shadera, konkretnie do ustawienia kierunku maskowania postaci
+SpriteRenderer.material.SetFloat("_CutPos", float position) - 
+funkcja służy do obsługi utworzonego przez nas shader'a, konkretnie do ustawienia pozycji maskowania postaci
+Input.GetAxis()- odpowiada za zczytywanie kierunków podanych przez gracza (również joysticka- zakres -1,1)
+transform.SetPositionAndRotation()- ustawia pozycje i obrót
+ScreenToWorldPoint()- zamienia punkt z przestrzeni ekranu do ekranu świata
+Quaternion.LookRotation()-tworzy obrót z pomocą zadanego punktu i kierunku
+animator.SetFloat("movingSpeed", float speed)- ustawianie zmiennej w Animatorze, służącej do przechodzenia pomiędzy animacją biegu a stania w miejscu
+animator.SetBool("grounded", bool) - ustawianie zmiennej w Animatorze, służącej do przechodzenia pomiędzy animacją skoku a resztą animacji
+
+3. Zasada działania programu
+Każdy z graczy ma własny kolor, niebieski lub pomaranczowy, w tym też kolorze może tworzyc portale, które są drzwiami, po wejściu do pierwszego wychodzimy drugim, o innym kolorze Na tej zależności, gdzie każdy gracz odpowiada za tylko jeden portal, opiera się większość logicznej części gry. Kluczowym elementem dla podjetych założeń było zapewnienie odpowiedniego działania warstwy sieciowej, ponieważ każdy z graczy gra osobno, należało stworzyć pewne mechanizmy, służace do wymiany różnych informacji, takich jak pozycja drugiej postaci czy tez tworzenie się portali. Niektore komponenty stworzylismy jako lokalne i przesyłalismy informacje tylko o ich inicjalizacji, tak jak w przypadku wystrzelenia pocisku, natomiast informacje o innych komponentach musiały byc aktualizowane co określony czas, tak jak poruszanie postacia, w tym przemieszczanie się w portalach.
+Aby postać mogła płynnie przechodzić przez portale użyliśmy wbudowanych funkcji silnika fizycznego Unity jak i shader'a stworzonego na potrzeby maskowania sprite'a. Kiedy postać dotyka portalu następuje wywołanie funkcji czujnika, który wyłącza kolizję ze ścianą na której znajduje się portal i ustawia zmienne materiału maskując postać. W tym samym momencie tworzona jest kopia gracza i pozycjonowana relatywnie w drugim portalu. W czasie kiedy postać znajduje się w portalu pozycja kopii cały czas jest aktualizowana. Po wyjściu bohatera z portalu oryginał zamieniany jest z kopią z zachowaniem sił fizycznych. Daje to iluzje płynnego przechodzenia przez portale i jest intuicyjne dla gracza.
+Zależnie od akcji wykonywanych przez gracza, gra reaguje w odpowiedni dla niej sposób, biorąc pod uwagę narzucone przez siebie ograniczenia w postaci np. kolizji. Postać miała poruszać się w sposób ludzki z zachowaniem stosownej dla tego typu gier uproszczeń i konwencji. Zastosowane metody i funkcje w prosty sposób komunikują się ze środowiskiem unity, co pozwala na osiągniecie zamierzonych celów przy zachowaniu zwięzłości kodu.

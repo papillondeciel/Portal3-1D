@@ -49,6 +49,7 @@ public class portalShooting : NetworkBehaviour {
     }
 
 
+
     [Command] //client wysyła żadanie na serwer by ten wykonał następującą motodę -> wystrzelił pocisk
     void CmdShoot(PlayerColor playerColor, Vector2 cursorPosition) //prefiks "Cmd" świadczy o tym że dana metoda może być wykonana tylko przez serwer
     {
