@@ -108,13 +108,14 @@ public class playerScript : NetworkBehaviour {
         }
         animator.SetFloat("movingSpeed", Mathf.Abs(move));
         animator.SetBool("grounded", grounded);
+        
     }
 
     public void pendHorizontalMovementChange()
     {
         pendInvertHorizontal = true;
     }
-
+    
     void OnApplicationFocus(bool hasFocus)
     {
         isPaused = !hasFocus;
@@ -124,13 +125,18 @@ public class playerScript : NetworkBehaviour {
     {
         isPaused = pauseStatus;
     }
-
+    public void Flip()
+    {
+        facingRight = !facingRight;
+        Vector3 theScale = transform.localScale;
+        theScale.x *= -1;
+        transform.localScale = theScale;
+    }
     [Command]
     public void CmdFlipCharacter()
     {
         RpcFlipCharacter();
     }
-
     [ClientRpc]
     public void RpcFlipCharacter()
     {
