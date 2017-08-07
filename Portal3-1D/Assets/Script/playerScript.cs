@@ -83,14 +83,13 @@ public class playerScript : NetworkBehaviour {
         float move = Input.GetAxis("Horizontal");
         if (invertHorizontalMovement)
             move = -move;
+
         if (move > 0 && !facingRight)
-        {
             CmdFlipCharacter();
-        }
+
         else if (move < 0 && facingRight)
-        {
             CmdFlipCharacter();
-        }
+
         if (rg2d.velocity.y < maxFallingSpeed)
             rg2d.velocity = new Vector2(rg2d.velocity.x, maxFallingSpeed);
         if (grounded)
@@ -108,7 +107,6 @@ public class playerScript : NetworkBehaviour {
         }
         animator.SetFloat("movingSpeed", Mathf.Abs(move));
         animator.SetBool("grounded", grounded);
-        
     }
 
     public void pendHorizontalMovementChange()
