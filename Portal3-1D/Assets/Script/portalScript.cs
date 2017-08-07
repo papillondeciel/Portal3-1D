@@ -33,7 +33,7 @@ public class portalScript : NetworkBehaviour {
             searchForOtherPortal();
         }
     }
-    private void searchForOtherPortal()
+    private void searchForOtherPortal() //funkcja używana do szukania portalu x przez portal y i pobieranie od niego niezbędnych danych
     {
         if (this.tag == "BluePortal")
         {
@@ -83,10 +83,13 @@ public class portalScript : NetworkBehaviour {
                 playerScript player = collision.gameObject.GetComponent<playerScript>();
                 if (!player.mimic) //Sprawdzam czy gracz nie ma na sobie znacznika "mimic", czyli czy nie jest swoją kopią w drugim portalu.
                 {
-                    Debug.Log("Player entered");
+                    //wyłączam kolizję gracza ze ścianą na której znajduje się portal
                     Physics2D.IgnoreCollision(collision.gameObject.GetComponent<Collider2D>(), wall.GetComponent<Collider2D>());
                     if (secondPortalFacing == FacingDirection.Left)
                     {
+                        //w następnych warunkach tworzę u ustawiam klon postaci która wychodzi z drugiego portalu,
+                        //w zależności od skierowania portalu i położenia ustawiam shader maskujący na klon gracza i jego dzieci (portal gun)
+
                         if (this.facingDirection == FacingDirection.Up)
                             teleportedCopy = Instantiate(collision.gameObject, new Vector3(secondPortal.transform.position.x + 0.5f, secondPortal.transform.position.y), Quaternion.identity);
                         else
@@ -150,11 +153,13 @@ public class portalScript : NetworkBehaviour {
                         teleportedCopy.transform.GetChild(1).GetComponent<SpriteRenderer>().material.SetFloat("_CutPos", this.transform.position.y);
                     }
 
+                    //wyłączam kolizje ze ściąną dla kopii gracza, wyłączam symulacje fizyki, i ustawiam klona jako dziecko gracza
                     Physics2D.IgnoreCollision(teleportedCopy.gameObject.GetComponent<Collider2D>(), oppositeWall.GetComponent<Collider2D>());
                     teleportedCopy.transform.parent = player.gameObject.transform;
                     teleportedScript.GetComponent<Rigidbody2D>().simulated = false;
                     teleportedScript.mimic = true;
 
+                    //tutaj nakładam w zależności od skierowania portalu do którego wchodzi gracz shader maskujący na gracza i jego dzieci (portal gun)
                     if (this.facingDirection == FacingDirection.Right)
                     {
                         player.rend.material.SetInt("_CutDirection", (int)FacingDirection.Right);
@@ -188,6 +193,8 @@ public class portalScript : NetworkBehaviour {
                         player.transform.GetChild(1).GetComponent<SpriteRenderer>().material.SetFloat("_CutPos", this.transform.position.y);
                         player.jumpEnabled = false;
                     }
+
+                    //wyłączam możliwość strzelania kiedy postać jest w portalu
                     collision.GetComponent<portalShooting>().enabled = false;
                     teleportedCopy.GetComponent<portalShooting>().enabled = false;
                 }
@@ -195,9 +202,9 @@ public class portalScript : NetworkBehaviour {
         }
     }
 
-    private void OnTriggerStay2D(Collider2D collision)
+    private void OnTriggerStay2D(Collider2D collision)//w tej funkcji pozycjonuje klona w zależności od ułożenia portali i postaci gracza, aby gracz miał wrażenie, że ruchy klona odpowiadają ruchowi postaci
     {
-        if (active /*&& collision.GetComponent<NetworkIdentity>().isLocalPlayer*/)
+        if (active)
         {
             if (collision.gameObject.tag == "PlayerBlue" || collision.gameObject.tag == "PlayerOrange")
             {
@@ -265,20 +272,21 @@ public class portalScript : NetworkBehaviour {
         }
     }
 
-    private void OnTriggerExit2D(Collider2D collision)
+    private void OnTriggerExit2D(Collider2D collision)//w tej funkcji obsługuje opuszczenie przez gracza portalu, w zależności od tego czy przez niego przeszedł czy nie usuwana jest kopia lub oryginał
     {
         if (active)
         {
             if (collision.gameObject.tag == "PlayerBlue" || collision.gameObject.tag == "PlayerOrange")
             {
+                //spowrotem włączenie kolizji dla gracza ze ścianami portali
                 Physics2D.IgnoreCollision(collision.gameObject.GetComponent<Collider2D>(), wall.GetComponent<Collider2D>(), false);
                 Physics2D.IgnoreCollision(collision.gameObject.GetComponent<Collider2D>(), oppositeWall.GetComponent<Collider2D>(), false);
                 bool destroyPlayer = false;
                 bool destroyCopy = false;
                 playerScript player = collision.gameObject.GetComponent<playerScript>();
-                if (!player.mimic)
+                if (!player.mimic)//kontrola czy gracz nie jest kopią
                 {
-                    Debug.Log("Player exited");
+                    //w następnych warunkach ustawiam w zależności od skierowania portali siły działające na kopie opuszczającą portal
                     if (this.facingDirection == FacingDirection.Right)
                     {
                         if (collision.transform.position.x < this.transform.position.x)
@@ -370,9 +378,10 @@ public class portalScript : NetworkBehaviour {
                 }
                 if (destroyPlayer)
                 {
+                    //tutaj następuje podmiana gracza na kopię z przepisaniem zmiennych
+
                     teleportedCopy.transform.parent = null;
                     teleportedCopy.GetComponent<playerScript>().mimic = false;
-                    //teleportedScript.pendHorizontalMovementChange();
                     collision.gameObject.transform.position = teleportedCopy.transform.position;
                     collision.gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(teleportedCopy.GetComponent<Rigidbody2D>().velocity.x, teleportedCopy.GetComponent<Rigidbody2D>().velocity.y);
                     player.thrown = teleportedScript.thrown;
@@ -388,6 +397,8 @@ public class portalScript : NetworkBehaviour {
                 }
                 else if (destroyCopy)
                 {
+                    //jeżeli gracz nie przeszedł portalu to usuwana jest jego kopia
+
                     Destroy(teleportedCopy);
                     player.rend.material.SetInt("_CutDirection", 0);
                     collision.GetComponent<portalShooting>().enabled = true;

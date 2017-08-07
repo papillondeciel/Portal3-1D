@@ -52,6 +52,9 @@ public class playerScript : NetworkBehaviour {
                 pendInvertHorizontal = false;
             }
         }
+
+        //niżej obrót portalguna w zależności od położenia myszy i kierunku gracza
+
         if (Input.GetAxis("Horizontal") > 0)
         {
             transform.GetChild(1).transform.SetPositionAndRotation(this.transform.position + left, transform.rotation);
@@ -76,13 +79,14 @@ public class playerScript : NetworkBehaviour {
 
     private void FixedUpdate()
     {
-        if (!isLocalPlayer) 
+        if (!isLocalPlayer)
             return;
 
         grounded = Physics2D.OverlapCircle(groundCheck.position, groundRadius, whatIsGround);
         float move = Input.GetAxis("Horizontal");
         if (invertHorizontalMovement)
             move = -move;
+        //warunki służące do obracania sprite'a gracza w zależności od kierunku ruchu
 
         if (move > 0 && !facingRight)
             CmdFlipCharacter();
@@ -90,13 +94,19 @@ public class playerScript : NetworkBehaviour {
         else if (move < 0 && facingRight)
             CmdFlipCharacter();
 
+        //ograniczenie prędkości spadania
+
         if (rg2d.velocity.y < maxFallingSpeed)
             rg2d.velocity = new Vector2(rg2d.velocity.x, maxFallingSpeed);
+        //sterowanie przez zmianę siły jeżeli gracz jest na ziemi
+
         if (grounded)
         {
             rg2d.velocity = new Vector2(move * maxSpeed, rg2d.velocity.y);
             thrown = false;
         }
+        //sterowanie przez dodawanie siły jeżeli gracz jest w powietrzu
+
         else if (!thrown)
         {
             if (move * rg2d.velocity.x < maxSpeed)
@@ -105,10 +115,13 @@ public class playerScript : NetworkBehaviour {
             if (Mathf.Abs(rg2d.velocity.x) > maxSpeed)
                 rg2d.velocity = new Vector2(Mathf.Sign(rg2d.velocity.x) * maxSpeed, rg2d.velocity.y);
         }
+        //ustawianie zmiennych w animatorze w zależności od stanu ruchu gracza
+
         animator.SetFloat("movingSpeed", Mathf.Abs(move));
         animator.SetBool("grounded", grounded);
     }
 
+    //funkcje obsługujące aktywną pauze (służące w dużej mierze do testowania), wyłączają możliwość strzelania jeżeli okno gry nie jest aktywne
     public void pendHorizontalMovementChange()
     {
         pendInvertHorizontal = true;
@@ -135,12 +148,10 @@ public class playerScript : NetworkBehaviour {
     {
         RpcFlipCharacter();
     }
+    //funkcja obracająca sprite gracza
     [ClientRpc]
     public void RpcFlipCharacter()
     {
-        facingRight = !facingRight;
-        Vector3 theScale = transform.localScale;
-        theScale.x *= -1;
-        transform.localScale = theScale;
+        Flip();
     }
 }

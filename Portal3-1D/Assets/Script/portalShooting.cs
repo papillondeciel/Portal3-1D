@@ -8,7 +8,6 @@ public class portalShooting : NetworkBehaviour {
     enum PlayerColor {Blue, Orange, None};
     private PlayerColor playerColor = PlayerColor.None;
     private audioSync audioS;
-    private Transform playerTrans;
     public Transform handgunMarker;
     public GameObject blueProjectilePrefab;
     public GameObject orangeProjectilePrefab;
@@ -23,7 +22,6 @@ public class portalShooting : NetworkBehaviour {
 
     // Use this for initialization
     void Start () {
-        playerTrans = GetComponent<Transform>();
         projectileVelovity = 3000f;
         if(tag == "PlayerBlue")//przypisanie koloru do gracza
             playerColor = PlayerColor.Blue;

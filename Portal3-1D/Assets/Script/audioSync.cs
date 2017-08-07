@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+//Klasa służąca do synchronizacji dźwięku miedzy graczami
 
 [RequireComponent(typeof(AudioSource))]
 public class audioSync : NetworkBehaviour {
@@ -12,15 +13,15 @@ public class audioSync : NetworkBehaviour {
 	void Start () {
         source = GetComponent<AudioSource>();
 	}
-	
-	public void playSound(int id)
+
+    public void playSound(int id) //funkcja odpowiadająca za 'odpalenie' danego klipu dźwięku
     {
-        if(id >= 0 && id < clips.Length)
+        if (id >= 0 && id < clips.Length)
         {
             CmdSendServerSoundID(id);
         }
     }
-
+    //funkcje konkretnie służące do synchronizacji
     [Command]
     void CmdSendServerSoundID(int id)
     {
